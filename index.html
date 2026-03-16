@@ -192,7 +192,53 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .btype-badge.detached{background:#F0EDE8;color:#6B6560;}
 .btype-badge.mansion{background:#EFF6FF;color:#1D4ED8;}
 .btype-note{font-size:11px;color:var(--text-hint);}
-@media print{header,.step-nav,.bottom-bar,.no-print{display:none!important;}body{background:#fff;}.main{padding:0;max-width:100%;}.step-page{display:block!important;}.panel,.ep-wrap{box-shadow:none;}}
+
+/* 見積鏡ページ */
+.kagami-page{background:#fff;border:1px solid var(--gray-border);border-radius:var(--r-lg);margin-bottom:14px;overflow:hidden;font-family:"Noto Sans JP",sans-serif;}
+.kagami-inner{padding:32px 36px;}
+.kagami-title-row{text-align:center;margin-bottom:28px;position:relative;}
+.kagami-title{font-size:26px;font-weight:700;letter-spacing:.4em;color:#111;}
+.kagami-date{position:absolute;right:0;top:4px;font-size:12px;color:#444;}
+.kagami-client-name{font-size:20px;font-weight:700;color:#111;border-bottom:2px solid #111;padding-bottom:4px;display:inline-block;min-width:260px;margin-bottom:4px;}
+.kagami-greeting{font-size:11px;color:#555;margin-top:6px;margin-bottom:22px;line-height:1.8;}
+.kagami-main{display:grid;grid-template-columns:1fr auto;gap:24px;margin-bottom:22px;align-items:start;}
+.kagami-amount-box{border:2px solid #111;padding:14px 20px;}
+.kagami-amount-label{font-size:13px;font-weight:700;border-bottom:1px solid #111;padding-bottom:5px;margin-bottom:9px;}
+.kagami-amount-total{font-size:30px;font-weight:700;letter-spacing:.03em;color:#111;margin-bottom:8px;}
+.kagami-amount-sub{font-size:12px;color:#444;line-height:2.1;}
+.kagami-company-box{text-align:right;min-width:200px;}
+.kagami-company-name{font-size:13px;font-weight:700;color:#111;margin-bottom:4px;}
+.kagami-company-sub{font-size:11px;color:#555;line-height:1.8;}
+.kagami-stamp-row{display:flex;justify-content:flex-end;gap:0;margin-top:10px;}
+.kagami-stamp-cell{width:62px;height:62px;border:1px solid #888;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#fff;}
+.kagami-stamp-cell:not(:first-child){border-left:none;}
+.kagami-stamp-label{position:absolute;bottom:1px;font-size:8px;color:#888;text-align:center;width:100%;}
+.kagami-stamp-img{width:100%;height:100%;object-fit:contain;padding:2px;}
+.kagami-stamp-empty{font-size:8px;color:#ccc;}
+.kagami-info-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;}
+.kagami-info-table td{padding:6px 9px;border:1px solid #bbb;vertical-align:top;line-height:1.7;}
+.kagami-info-table td:first-child{background:#f5f5f5;font-weight:700;white-space:nowrap;width:90px;}
+.kagami-tokki{font-size:11px;color:#444;border:1px solid #bbb;padding:9px 12px;line-height:1.8;}
+.kagami-tokki-lbl{font-weight:700;font-size:12px;margin-bottom:3px;}
+
+/* 印鑑アップロード */
+.stamp-upload-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.stamp-slot{border:1px dashed var(--gray-border);border-radius:var(--r-sm);padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.stamp-slot:hover{border-color:var(--copper);}
+.stamp-slot-lbl{font-size:10px;font-weight:700;color:var(--text-sub);margin-bottom:5px;}
+.stamp-slot-preview{width:56px;height:56px;border:1px solid var(--gray-border);border-radius:4px;object-fit:contain;display:block;margin:0 auto 5px;background:#fff;padding:2px;}
+.stamp-slot-empty{width:56px;height:56px;border:1px solid var(--gray-border);border-radius:4px;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;background:var(--gray-subtle);font-size:20px;color:var(--text-hint);}
+
+@media print{
+  header,.step-nav,.bottom-bar,.no-print{display:none!important;}
+  body{background:#fff;}
+  .main{padding:0;max-width:100%;}
+  .step-page{display:block!important;}
+  .panel,.ep-wrap,.kagami-page{box-shadow:none;border-radius:0;}
+  .kagami-page{border:none;margin-bottom:0;}
+  .ep-wrap{border:none;}
+  .kagami-page{page-break-after:always;}
+}
 </style>
 </head>
 <body>
@@ -250,6 +296,33 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
         <span class="demo-btn-icon">💾</span>
         <div><div class="demo-btn-label">会社情報を保存</div><div class="demo-btn-desc">次回から自動でセットされます</div></div>
       </button>
+
+      <div class="set-sec" style="margin-top:20px;">🔖 印鑑画像の登録</div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:10px;line-height:1.7;">PNG・JPEGの印鑑画像を登録できます。見積鏡ページの印鑑欄に自動で表示されます。</div>
+      <div class="stamp-upload-grid">
+        <div class="stamp-slot" onclick="el('stamp-file-0').click()">
+          <div class="stamp-slot-lbl">社印</div>
+          <div id="stamp-preview-0"><div class="stamp-slot-empty">🔖</div></div>
+          <input type="file" id="stamp-file-0" accept="image/*" style="display:none" onchange="loadStamp(0,this)">
+          <div style="font-size:10px;color:var(--copper);">タップして登録</div>
+          <button onclick="event.stopPropagation();clearStamp(0)" style="font-size:10px;color:#B91C1C;background:none;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:block;margin:3px auto 0;">クリア</button>
+        </div>
+        <div class="stamp-slot" onclick="el('stamp-file-1').click()">
+          <div class="stamp-slot-lbl">確認者印</div>
+          <div id="stamp-preview-1"><div class="stamp-slot-empty">🔖</div></div>
+          <input type="file" id="stamp-file-1" accept="image/*" style="display:none" onchange="loadStamp(1,this)">
+          <div style="font-size:10px;color:var(--copper);">タップして登録</div>
+          <button onclick="event.stopPropagation();clearStamp(1)" style="font-size:10px;color:#B91C1C;background:none;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:block;margin:3px auto 0;">クリア</button>
+        </div>
+        <div class="stamp-slot" onclick="el('stamp-file-2').click()">
+          <div class="stamp-slot-lbl">作成者印</div>
+          <div id="stamp-preview-2"><div class="stamp-slot-empty">🔖</div></div>
+          <input type="file" id="stamp-file-2" accept="image/*" style="display:none" onchange="loadStamp(2,this)">
+          <div style="font-size:10px;color:var(--copper);">タップして登録</div>
+          <button onclick="event.stopPropagation();clearStamp(2)" style="font-size:10px;color:#B91C1C;background:none;border:none;cursor:pointer;font-family:'Noto Sans JP',sans-serif;display:block;margin:3px auto 0;">クリア</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--text-hint);line-height:1.6;">印鑑画像はこのブラウザに保存されます。透過PNG推奨です。</div>
       <div class="set-sec" style="margin-top:20px;">表示テーマ</div>
       <div class="set-item">
         <div><div class="set-lbl">ダークモード</div><div class="set-desc">画面を暗いテーマに切り替えます</div></div>
@@ -466,6 +539,52 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 
 <!-- STEP4 -->
 <div class="step-page" id="step4">
+
+  <!-- 見積鏡ページ -->
+  <div class="kagami-page" id="kagami-area">
+    <div class="kagami-inner">
+      <div class="kagami-title-row">
+        <div class="kagami-title">御　見　積　書</div>
+        <div class="kagami-date" id="kg-date"></div>
+      </div>
+      <div>
+        <div class="kagami-client-name" id="kg-client"></div>
+        <div class="kagami-greeting">下記の通りお見積致します。何卒ご用命くださいますようお願い申し上げます。</div>
+      </div>
+      <div class="kagami-main">
+        <div class="kagami-amount-box">
+          <div class="kagami-amount-label">御　見　積　金　額</div>
+          <div class="kagami-amount-total" id="kg-total">¥0　　<span style="font-size:14px;font-weight:400;">※（税込）</span></div>
+          <div class="kagami-amount-sub">
+            <span id="kg-sub-line"></span>
+          </div>
+        </div>
+        <div class="kagami-company-box">
+          <div class="kagami-company-name" id="kg-company"></div>
+          <div class="kagami-company-sub" id="kg-company-sub"></div>
+          <div class="kagami-stamp-row" id="kg-stamps">
+            <div class="kagami-stamp-cell"><span class="kagami-stamp-label">社印</span></div>
+            <div class="kagami-stamp-cell"><span class="kagami-stamp-label">確認</span></div>
+            <div class="kagami-stamp-cell"><span class="kagami-stamp-label">作成</span></div>
+          </div>
+        </div>
+      </div>
+      <table class="kagami-info-table">
+        <tr><td>工事名称</td><td id="kg-koji-name"></td></tr>
+        <tr><td>見積番号</td><td id="kg-estno"></td></tr>
+        <tr><td>有効期限</td><td id="kg-expire"></td></tr>
+        <tr><td>工事場所</td><td id="kg-loc"></td></tr>
+        <tr><td>工事期間</td><td id="kg-period">別途お打合せ</td></tr>
+        <tr><td>支払条件</td><td id="kg-payment">別途お打合せ</td></tr>
+      </table>
+      <div class="kagami-tokki">
+        <div class="kagami-tokki-lbl">特記事項</div>
+        <div id="kg-tokki"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 明細ページ -->
   <div class="ep-wrap" id="print-area">
     <div class="ep-hdr"><div><div class="ep-title">御　見　積　書</div><div class="ep-no" id="ep-no"></div></div><div class="ep-client" id="ep-client"></div></div>
     <div class="ep-body">
@@ -598,7 +717,7 @@ window.onload=()=>{
   el("e-no").value="EST-"+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate());
   el("hdr-date").textContent=t.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
   if(localStorage.getItem("darkMode")==="1"){document.body.classList.add("dark");el("dark-tgl").checked=true;}
-  loadCR();loadB5();applyProfile();loadKojiTpl();
+  loadCR();loadB5();applyProfile();loadKojiTpl();loadStamps();
 };
 
 function applyProfile(){
@@ -822,7 +941,45 @@ function getKojiSum(){
   return s;
 }
 
-// ── 工事費テンプレート ──
+// ── 印鑑画像 ──
+let stamps=[null,null,null];
+const STAMP_LABELS=["社印","確認","作成"];
+
+function loadStamps(){
+  for(let i=0;i<3;i++){
+    const s=localStorage.getItem("stamp-"+i);
+    if(s){stamps[i]=s;renderStampPreview(i);}
+  }
+}
+function loadStamp(i,input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    stamps[i]=e.target.result;
+    localStorage.setItem("stamp-"+i,stamps[i]);
+    renderStampPreview(i);
+  };
+  reader.readAsDataURL(file);
+}
+function renderStampPreview(i){
+  const wrap=el("stamp-preview-"+i);if(!wrap)return;
+  if(stamps[i]){
+    wrap.innerHTML='<img src="'+stamps[i]+'" class="stamp-slot-preview" alt="印鑑'+i+'">';
+  }else{
+    wrap.innerHTML='<div class="stamp-slot-empty">🔖</div>';
+  }
+}
+function clearStamp(i){
+  stamps[i]=null;localStorage.removeItem("stamp-"+i);
+  renderStampPreview(i);
+}
+function toWareki(iso){
+  if(!iso)return"";
+  const d=new Date(iso),y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate();
+  let era="令和",ey=y-2018;if(y<2019){era="平成";ey=y-1988;}
+  return era+(ey===1?"元":ey)+"年"+m+"月"+dd+"日";
+}
+
 const DEFAULT_KOJI_TPL=[
   {name:"キッチン 一戸建て",items:[["設置工事費",1,120000],["既設品撤去処分費",1,35000],["給排水工事費",1,45000],["諸経費",1,20000]]},
   {name:"キッチン マンション",items:[["設置工事費",1,100000],["既設品撤去処分費",1,30000],["給排水工事費",1,40000],["搬入養生費",1,15000],["諸経費",1,15000]]},
@@ -938,7 +1095,49 @@ function updateBar(total,pr){
 
 function buildPrev(){
   calcTotals();
-  const estNo=v("e-no"),iss=v("e-issue"),exp=v("e-expire");
+
+  // ── 見積鏡ページ生成 ──
+  const p=JSON.parse(localStorage.getItem("companyProfile")||"{}");
+  const iss=v("e-issue"),exp=v("e-expire"),estNo=v("e-no");
+  const clientName=v("c-name")||"—";
+  const loc=v("c-loc")||"—";
+  const wn=v("e-company")||p.company||"";
+  const wt=v("e-ctel")||p.tel||"";
+  const ws=v("e-staff")||p.staff||"";
+  const bikoRaw=el("備考").value||"";
+
+  // 金額計算
+  const ps=products.reduce((s,p2)=>s+p2.sell,0),ks=getKojiSum();
+  const disc=parseFloat(el("discount").value)||0,sub=ps+ks-disc;
+  const tax=Math.round(sub*.1),tot=sub+tax;
+
+  el("kg-date").textContent=iss?toWareki(iss):"";
+  el("kg-client").textContent=clientName;
+  el("kg-total").innerHTML="¥"+tot.toLocaleString()+"　<span style='font-size:14px;font-weight:400;'>※（税込）</span>";
+  el("kg-sub-line").innerHTML="工事金額　¥"+sub.toLocaleString()+"（税抜）<br>消費税　　¥"+tax.toLocaleString()+"（10.00%）";
+
+  // 工事名称 = お客様名 + 工事場所
+  el("kg-koji-name").textContent=clientName+"　"+loc+"リフォーム工事";
+  el("kg-estno").textContent=estNo;
+  el("kg-expire").textContent=exp?"見積日より30日間（"+exp+"まで）":"—";
+  el("kg-loc").textContent=v("c-addr")||loc;
+  el("kg-tokki").innerHTML=bikoRaw.replace(/\n/g,"<br>")||"特になし";
+
+  // 会社情報
+  el("kg-company").textContent=wn;
+  el("kg-company-sub").innerHTML=(p.zip?"〒"+p.zip+"<br>":"")+
+    (p.addr||"")+
+    (wt?"<br>TEL："+wt:"")+
+    (ws?"<br>担当："+ws:"");
+
+  // 印鑑欄
+  const stampWrap=el("kg-stamps");
+  stampWrap.innerHTML=["社印","確認","作成"].map((lbl,i)=>{
+    const img=stamps[i]?'<img src="'+stamps[i]+'" class="kagami-stamp-img" alt="'+lbl+'">':'<span class="kagami-stamp-empty">　</span>';
+    return '<div class="kagami-stamp-cell">'+img+'<span class="kagami-stamp-label">'+lbl+'</span></div>';
+  }).join("");
+
+  // ── 明細ページ生成 ──
   const btypeLabel=btype==='mansion'?'🏢 マンション':'🏠 一戸建て';
   el("ep-no").textContent="見積番号："+estNo+"　発行日："+iss+"　有効期限："+exp+"　"+btypeLabel;
   el("ep-client").innerHTML="<strong>"+(v("c-name")||"—")+"</strong><br>"+(v("c-addr")||"—")+"<br>"+v("c-tel")+"<br><br>工事予定日："+(v("c-wdate")||"—");
