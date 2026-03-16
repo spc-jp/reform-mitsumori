@@ -359,6 +359,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
       <button class="demo-btn" onclick="loadDemo('kitchen')"><span class="demo-btn-icon">🍳</span><div><div class="demo-btn-label">キッチンリフォーム デモ</div><div class="demo-btn-desc">LIXIL リシェルSI + 工事費セット</div></div></button>
       <button class="demo-btn" onclick="loadDemo('bathroom')"><span class="demo-btn-icon">🛁</span><div><div class="demo-btn-label">浴室リフォーム デモ</div><div class="demo-btn-desc">TOTO サザナ + 工事費セット</div></div></button>
       <button class="demo-btn" onclick="loadDemo('toilet')"><span class="demo-btn-icon">🚽</span><div><div class="demo-btn-label">トイレリフォーム デモ</div><div class="demo-btn-desc">TOTO ネオレスト + 工事費セット</div></div></button>
+      <button class="demo-btn" onclick="loadDemo('washroom')"><span class="demo-btn-icon">🪥</span><div><div class="demo-btn-label">洗面台リフォーム デモ</div><div class="demo-btn-desc">LIXIL ピアラ 750mm + 工事費セット</div></div></button>
       <div class="set-sec" style="margin-top:20px;">データ管理</div>
       <button class="clr-btn" onclick="clearAll()">🗑 すべてのデータをクリア</button>
       <div class="clr-note">入力した内容・追加した商品がすべて消去されます<br>この操作は取り消せません</div>
@@ -1613,7 +1614,8 @@ function loadDemo(type){
   const DM={
     kitchen:{name:"山田 花子 様",tel:"090-1234-5678",addr:"埼玉県さいたま市大宮区〇〇 1-2-3",loc:"キッチン",staff:"鈴木 一郎",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"LIXIL",cat:"キッチン",name:"リシェルSI I型 2100mm",code:"RS-I2100",price:980000,rate:0.70,sell:686000,cr:0.52,genka:509600}],koji:[["設置工事費",120000],["既設品撤去処分費",35000],["給排水工事費",45000],["諸経費",20000]],disc:0},
     bathroom:{name:"佐藤 次郎 様",tel:"090-9876-5432",addr:"埼玉県川口市〇〇 4-5-6",loc:"浴室",staff:"田中 美咲",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"TOTO",cat:"浴室",name:"サザナ Sタイプ 1616",code:"SZ-1616S",price:520000,rate:0.72,sell:374400,cr:0.53,genka:275600}],koji:[["解体工事費",80000],["設置工事費",100000],["給排水工事費",30000],["諸経費",15000]],disc:10000},
-    toilet:{name:"高橋 三郎 様",tel:"080-1111-2222",addr:"埼玉県越谷市〇〇 2-3-1",loc:"トイレ（1F・2F）",staff:"山本 健司",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"TOTO",cat:"トイレ",name:"ネオレスト AH1",code:"CES9710",price:328000,rate:0.65,sell:213200,cr:0.53,genka:173840},{maker:"TOTO",cat:"トイレ",name:"GG2 ZJ2",code:"CES9898",price:198000,rate:0.65,sell:128700,cr:0.53,genka:104940}],koji:[["設置工事費（×2箇所）",60000],["既設品撤去処分費",20000],["諸経費",10000]],disc:5000},
+    toilet:{name:"高橋 三郎 様",tel:"080-1111-2222",addr:"埼玉県越谷市〇〇 2-3-1",loc:"トイレ（1F・2F）",staff:"山本 健司",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"TOTO",cat:"トイレ",name:"ネオレスト AH1",code:"CES9710",price:328000,rate:0.65,sell:213200,cr:0.53,genka:173840},{maker:"TOTO",cat:"トイレ",name:"GG2 ZJ2",code:"CES9898",price:198000,rate:0.65,sell:128700,cr:0.53,genka:104940}],koji:[["設置工事費（×2箇所）",1,60000],["既設品撤去処分費",1,20000],["諸経費",1,10000]],disc:5000},
+    washroom:{name:"鈴木 幸子 様",tel:"090-3333-4444",addr:"埼玉県春日部市〇〇 3-4-5",loc:"洗面台",staff:"田中 美咲",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"LIXIL",cat:"洗面台",name:"ピアラ 750mm 3面鏡",code:"AR75T",price:218000,rate:0.70,sell:152600,cr:0.52,genka:113360}],koji:[["設置工事費",1,40000],["既設品撤去処分費",1,15000],["給排水工事費",1,12000],["諸経費",1,8000]],disc:0},
   };
   const dm=DM[type];if(!dm)return;
   const s=(id,val)=>{const e=el(id);if(e)e.value=val||"";};
