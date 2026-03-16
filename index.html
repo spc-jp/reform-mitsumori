@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リフォーム見積くん v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F5F0;--surface:#FFF;--navy:#1A2535;--navy-light:#2C3E55;--copper:#B5733A;--copper-light:#D4956A;--copper-pale:#F5EDE4;--gray-border:#E0DBD4;--gray-subtle:#F0EDE8;--text-main:#1A2535;--text-sub:#6B6560;--text-hint:#A09890;--success:#2E7D5E;--r-sm:6px;--r-md:10px;--r-lg:16px;--sh-sm:0 1px 4px rgba(26,37,53,.08);}
+body.dark{--bg:#111827;--surface:#1F2937;--navy:#0D1520;--navy-light:#1A2535;--gray-border:#374151;--gray-subtle:#273040;--text-main:#F3F0EB;--text-sub:#9CA3AF;--text-hint:#6B7280;--copper-pale:#2A1F14;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Noto Sans JP",sans-serif;background:var(--bg);color:var(--text-main);min-height:100vh;font-size:14px;line-height:1.7;}
+header{background:var(--navy);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:8px;padding:4px 6px;transition:background .15s;}
+.logo:hover{background:rgba(255,255,255,.08);}
+.logo-icon{width:32px;height:32px;background:var(--copper);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-family:"Cormorant Garamond",serif;color:#fff;font-size:22px;font-weight:600;letter-spacing:.04em;}
+.logo-sub{color:rgba(255,255,255,.45);font-size:11px;letter-spacing:.06em;}
+.hdr-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.85);border-radius:8px;padding:6px 12px;font-family:"Noto Sans JP",sans-serif;font-size:12px;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.hdr-btn:hover{background:rgba(255,255,255,.15);}
+.step-nav{background:var(--surface);border-bottom:1px solid var(--gray-border);padding:0 24px;}
+.step-nav-inner{max-width:920px;margin:0 auto;display:flex;}
+.step-tab{display:flex;align-items:center;gap:8px;padding:14px 18px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text-hint);font-size:13px;transition:all .2s;white-space:nowrap;}
+.step-tab.active{color:var(--copper);border-bottom-color:var(--copper);font-weight:500;}
+.step-tab.done{color:var(--success);}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:var(--gray-subtle);color:var(--text-hint);}
+.step-tab.active .step-num{background:var(--copper);color:#fff;}
+.step-tab.done .step-num{background:var(--success);color:#fff;}
+.main{max-width:920px;margin:0 auto;padding:24px 24px 90px;}
+.step-page{display:none;}.step-page.active{display:block;}
+.panel{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--gray-border);padding:22px;margin-bottom:14px;box-shadow:var(--sh-sm);}
+.panel-title{font-size:12px;font-weight:700;color:var(--copper);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.panel-title::before{content:"";width:3px;height:13px;background:var(--copper);border-radius:2px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-grid.three{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:500;color:var(--text-sub);letter-spacing:.04em;}
+input[type=text],input[type=number],input[type=date],select{height:38px;border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:0 10px;font-size:13px;font-family:"Noto Sans JP",sans-serif;color:var(--text-main);background:var(--surface);outline:none;width:100%;transition:border-color .15s;}
+input:focus,select:focus{border-color:var(--copper-light);box-shadow:0 0 0 3px rgba(181,115,58,.1);}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2712%27 height=%278%27%3E%3Cpath d=%27M1 1l5 5 5-5%27 stroke=%27%23A09890%27 stroke-width=%271.5%27 fill=%27none%27 stroke-linecap=%27round%27/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.btn{height:38px;padding:0 16px;border-radius:var(--r-sm);font-family:"Noto Sans JP",sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.btn-copper{background:var(--copper);color:#fff;}.btn-copper:hover{background:#9E6232;}
+.btn-outline{background:none;border:1px solid var(--gray-border);color:var(--text-sub);}.btn-outline:hover{background:var(--gray-subtle);}
+.btn-navy{background:var(--navy);color:#fff;height:44px;font-size:14px;padding:0 24px;border-radius:var(--r-md);}.btn-navy:hover{background:var(--navy-light);}
+.btn-excel{background:#1D6A3A;color:#fff;height:38px;padding:0 16px;border-radius:var(--r-sm);border:none;font-family:"Noto Sans JP",sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;}.btn-excel:hover{background:#155228;}
+.btn-hist{background:#4A5568;color:#fff;height:38px;padding:0 16px;border-radius:var(--r-sm);border:none;font-family:"Noto Sans JP",sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;}.btn-hist:hover{background:#2D3748;}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--text-hint);padding:4px 6px;border-radius:4px;font-size:16px;line-height:1;transition:all .15s;}.del-btn:hover{color:#c0392b;background:#FDECEA;}
+.b5-wrap{background:var(--copper-pale);border:1px solid rgba(181,115,58,.2);border-radius:var(--r-md);padding:14px 16px;margin-bottom:14px;}
+.b5-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.b5-ttl{font-size:11px;font-weight:700;color:var(--copper);letter-spacing:.08em;}
+.b5-edit-btn{font-size:11px;background:none;border:1px solid var(--copper-light);color:var(--copper);border-radius:5px;padding:3px 10px;cursor:pointer;font-family:"Noto Sans JP",sans-serif;}.b5-edit-btn:hover{background:rgba(181,115,58,.1);}
+.b5-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+@media(max-width:680px){.b5-grid{grid-template-columns:repeat(3,1fr);}.form-grid,.form-grid.three{grid-template-columns:1fr;}}
+.b5-card{background:var(--surface);border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:10px;cursor:pointer;transition:all .15s;text-align:left;font-family:"Noto Sans JP",sans-serif;width:100%;}.b5-card:hover{border-color:var(--copper);background:var(--copper-pale);}
+.b5-card.empty{border-style:dashed;cursor:default;opacity:.5;}
+.b5-maker{font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--copper);margin-bottom:2px;}
+.b5-name{font-size:11px;font-weight:500;color:var(--text-main);line-height:1.4;margin-bottom:3px;}
+.b5-price{font-size:10px;color:var(--text-hint);font-variant-numeric:tabular-nums;}
+@keyframes b5flash{0%{background:#D1FAE5;border-color:#2E7D5E}100%{background:var(--surface);border-color:var(--gray-border)}}
+.b5-flash{animation:b5flash .5s ease;}
+.prod-sel{background:var(--gray-subtle);border:1px dashed var(--gray-border);border-radius:var(--r-md);padding:14px;margin-bottom:14px;}
+.sel-row{display:grid;grid-template-columns:1fr 1fr 2fr .9fr .9fr .9fr auto;gap:8px;align-items:end;}
+@media(max-width:800px){.sel-row{grid-template-columns:1fr 1fr;}}
+.sel-prev{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;}
+.sel-prev span{font-weight:700;}
+.item-table{width:100%;border-collapse:collapse;font-size:13px;}
+.item-table th{font-size:11px;font-weight:500;color:var(--text-hint);letter-spacing:.05em;padding:8px 10px;text-align:left;border-bottom:1px solid var(--gray-border);}
+.item-table td{padding:10px;border-bottom:1px solid var(--gray-subtle);vertical-align:middle;}
+.item-table tr:last-child td{border-bottom:none;}
+.item-table tr:hover td{background:var(--gray-subtle);}
+.pc{text-align:right;font-variant-numeric:tabular-nums;}
+.bdg{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.05em;}
+.bl{background:#E8F0FB;color:#1A4EA6;}.bt{background:#EBF5EC;color:#1D6B2C;}.bk{background:#FBF0E8;color:#A6441A;}.bo{background:var(--gray-subtle);color:var(--text-sub);}
+.empty-st{text-align:center;padding:28px;color:var(--text-hint);}
+.s3-grid{display:grid;grid-template-columns:1fr 290px;gap:14px;margin-bottom:14px;align-items:start;}
+@media(max-width:720px){.s3-grid{grid-template-columns:1fr;}}
+.koji-row{display:grid;grid-template-columns:2fr 1fr auto;gap:10px;margin-bottom:10px;}
+.sum-box{background:var(--navy);border-radius:var(--r-lg);padding:18px 20px;color:#fff;}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;color:rgba(255,255,255,.65);border-bottom:1px solid rgba(255,255,255,.08);}
+.sum-row:last-child{border-bottom:none;}
+.sum-row.tot{padding-top:10px;margin-top:4px;color:#fff;font-size:15px;font-weight:700;}
+.sa{font-variant-numeric:tabular-nums;font-weight:500;color:#fff;}
+.sum-row.tot .sa{font-size:20px;color:#F4C97A;}
+.profit-panel{background:var(--navy);border-radius:var(--r-lg);padding:16px;display:flex;flex-direction:column;gap:9px;}
+.pp-badge{font-size:9px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.38);border:1px solid rgba(255,255,255,.12);border-radius:4px;padding:2px 7px;width:fit-content;}
+.pm-card{border-radius:var(--r-md);padding:12px 14px;transition:background .35s;}
+.pm-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.65);margin-bottom:4px;}
+.pm-val{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;line-height:1.1;}
+.pm-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:3px;}
+.pr-card{background:rgba(255,255,255,.07);border-radius:var(--r-md);padding:11px 14px;}
+.pr-lbl{font-size:10px;color:rgba(255,255,255,.5);margin-bottom:2px;}
+.pr-val{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:#F4C97A;}
+.pr-track{background:rgba(255,255,255,.12);border-radius:4px;height:6px;margin-top:7px;overflow:hidden;}
+.pr-bar{height:100%;border-radius:4px;transition:width .4s ease,background .4s;}
+.pr-tgt{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.ps-card{background:rgba(255,255,255,.05);border-radius:var(--r-sm);padding:9px 11px;}
+.ps-lbl{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:2px;}
+.ps-val{font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
+.ep-wrap{border:1px solid var(--gray-border);border-radius:var(--r-lg);overflow:hidden;}
+.ep-hdr{background:var(--navy);color:#fff;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start;}
+.ep-title{font-family:"Cormorant Garamond",serif;font-size:26px;font-weight:600;letter-spacing:.06em;}
+.ep-no{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;}
+.ep-client{text-align:right;font-size:13px;color:rgba(255,255,255,.8);line-height:1.8;}
+.ep-body{padding:22px 26px;background:#fff;}
+.ep-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px;}
+.ep-tbl th{background:var(--gray-subtle);padding:8px 11px;text-align:left;font-size:11px;font-weight:700;color:var(--text-sub);letter-spacing:.06em;}
+.ep-tbl td{padding:9px 11px;border-bottom:1px solid var(--gray-subtle);}
+.ep-tbl .tr{text-align:right;}
+.ep-total-wrap{display:flex;justify-content:flex-end;}
+.ep-total-box{min-width:250px;}
+.epr{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;color:var(--text-sub);}
+.epr.grand{border-top:2px solid var(--navy);margin-top:7px;padding-top:11px;font-weight:700;font-size:16px;color:var(--navy);}
+.ep-note{margin-top:18px;padding:12px;background:var(--gray-subtle);border-radius:var(--r-sm);font-size:12px;color:var(--text-sub);line-height:1.9;}
+.ep-footer{background:var(--gray-subtle);padding:13px 26px;font-size:11px;color:var(--text-hint);display:flex;justify-content:space-between;}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--gray-border);padding:10px 24px;display:flex;justify-content:space-between;align-items:center;z-index:100;box-shadow:0 -4px 14px rgba(26,37,53,.06);}
+.bar-total-wrap{display:flex;align-items:baseline;gap:7px;}
+.bar-lbl{font-size:12px;color:var(--text-hint);}
+.bar-amt{font-size:22px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;}
+.bar-tax{font-size:12px;color:var(--text-hint);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:flex-end;}
+.overlay.open{display:flex;}
+.drawer{background:var(--surface);width:340px;max-width:92vw;height:100vh;overflow-y:auto;display:flex;flex-direction:column;animation:slideIn .22s ease;}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.drw-hdr{padding:18px 20px 13px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between;}
+.drw-title{font-size:15px;font-weight:700;color:var(--text-main);}
+.drw-close{background:none;border:none;font-size:20px;color:var(--text-hint);cursor:pointer;padding:4px 6px;border-radius:4px;}.drw-close:hover{background:var(--gray-subtle);}
+.drw-body{padding:18px 20px;flex:1;}
+.ht-step{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.ht-num{width:26px;height:26px;border-radius:50%;background:var(--copper);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ht-ttl{font-size:14px;font-weight:700;color:var(--text-main);}
+.ht-list{list-style:none;margin:0 0 18px 36px;padding:0;}
+.ht-list li{font-size:12px;color:var(--text-sub);padding:3px 0 3px 14px;line-height:1.65;position:relative;}
+.ht-list li::before{content:">";position:absolute;left:0;color:var(--copper-light);font-size:14px;line-height:1.3;}
+.ht-tip{background:var(--copper-pale);border-left:3px solid var(--copper);border-radius:0 6px 6px 0;padding:9px 11px;font-size:11px;color:var(--text-sub);line-height:1.7;}
+.set-sec{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-hint);text-transform:uppercase;margin:18px 0 8px;}
+.set-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--gray-border);}
+.set-lbl{font-size:13px;font-weight:500;color:var(--text-main);}
+.set-desc{font-size:11px;color:var(--text-hint);margin-top:2px;}
+.tgl-wrap{position:relative;width:44px;height:24px;flex-shrink:0;}
+.tgl-wrap input{opacity:0;width:0;height:0;position:absolute;}
+.tgl-track{position:absolute;inset:0;background:var(--gray-border);border-radius:12px;cursor:pointer;transition:background .2s;}
+.tgl-track::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.tgl-wrap input:checked+.tgl-track{background:var(--copper);}
+.tgl-wrap input:checked+.tgl-track::after{transform:translateX(20px);}
+.demo-btn{width:100%;padding:10px;border-radius:var(--r-sm);border:1px solid var(--gray-border);background:var(--surface);color:var(--text-sub);font-family:"Noto Sans JP",sans-serif;font-size:12px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;margin-bottom:7px;transition:background .15s;}.demo-btn:hover{background:var(--gray-subtle);}
+.demo-btn-icon{font-size:16px;flex-shrink:0;}
+.demo-btn-label{font-weight:500;color:var(--text-main);font-size:13px;}
+.demo-btn-desc{font-size:11px;color:var(--text-hint);}
+.clr-btn{width:100%;padding:10px;border-radius:var(--r-sm);border:1px solid #FECACA;background:#FEF2F2;color:#B91C1C;font-family:"Noto Sans JP",sans-serif;font-size:12px;font-weight:500;cursor:pointer;margin-top:4px;display:flex;align-items:center;gap:6px;transition:background .15s;}.clr-btn:hover{background:#FEE2E2;}
+.clr-note{font-size:10px;color:var(--text-hint);margin-top:7px;text-align:center;line-height:1.6;}
+.cr-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--gray-border);font-size:13px;}.cr-row:last-child{border-bottom:none;}
+.cr-maker{font-weight:500;color:var(--text-main);min-width:90px;}
+.cr-input{width:76px!important;text-align:right;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal-box{background:var(--surface);border-radius:var(--r-lg);width:100%;max-width:640px;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-hdr{padding:16px 20px 13px;border-bottom:1px solid var(--gray-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-ttl{font-size:15px;font-weight:700;color:var(--text-main);}
+.modal-close{background:none;border:none;font-size:20px;color:var(--text-hint);cursor:pointer;padding:4px 6px;border-radius:4px;}.modal-close:hover{background:var(--gray-subtle);}
+.modal-body{flex:1;overflow-y:auto;padding:14px 20px;}
+.hist-card{border:1px solid var(--gray-border);border-radius:var(--r-md);padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:flex-start;gap:11px;}.hist-card:hover{border-color:var(--copper);background:var(--copper-pale);}
+.hist-client{font-size:14px;font-weight:700;color:var(--text-main);}
+.hist-meta{font-size:11px;color:var(--text-hint);margin-top:3px;}
+.hist-amount{font-size:15px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.hist-del{background:none;border:1px solid #FECACA;color:#B91C1C;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:"Noto Sans JP",sans-serif;}.hist-del:hover{background:#FEE2E2;}
+.hist-empty{text-align:center;padding:36px 16px;color:var(--text-hint);font-size:13px;}
+.b5e-slot{border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:12px;margin-bottom:9px;}
+.b5e-title{font-size:11px;font-weight:700;color:var(--copper);margin-bottom:8px;}
+
+/* 工事費テンプレート */
+.koji-tpl-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;}
+.koji-tpl-btn{background:var(--copper-pale);border:1px solid rgba(181,115,58,.3);color:var(--copper);border-radius:16px;padding:5px 14px;font-family:"Noto Sans JP",sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.koji-tpl-btn:hover{background:var(--copper);color:#fff;}
+/* 数量付きkoji-row */
+.koji-row{display:grid;grid-template-columns:2fr 0.7fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;}
+.koji-row-lbl{font-size:10px;color:var(--text-hint);text-align:center;}
+/* 商品テーブル 数量列 */
+.qty-cell{display:flex;align-items:center;gap:4px;}
+.qty-btn{width:22px;height:22px;border:1px solid var(--gray-border);border-radius:4px;background:var(--surface);color:var(--text-sub);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
+.qty-btn:hover{background:var(--copper);color:#fff;border-color:var(--copper);}
+.qty-num{min-width:20px;text-align:center;font-size:13px;font-weight:700;color:var(--text-main);}
+.btype-wrap{display:flex;align-items:center;gap:10px;background:var(--gray-subtle);border-radius:var(--r-md);padding:12px 16px;margin-bottom:14px;border:1px solid var(--gray-border);}
+.btype-label{font-size:12px;font-weight:700;color:var(--text-sub);white-space:nowrap;}
+.btype-toggle{display:flex;background:var(--gray-border);border-radius:20px;padding:3px;gap:2px;flex-shrink:0;}
+.btype-btn{padding:6px 18px;border-radius:16px;border:none;font-family:"Noto Sans JP",sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-sub);background:none;}
+.btype-btn.active{background:var(--surface);color:var(--navy);font-weight:700;box-shadow:0 1px 4px rgba(26,37,53,.12);}
+.btype-btn.detached.active{background:var(--navy);color:#fff;}
+.btype-btn.mansion.active{background:#2563EB;color:#fff;}
+.btype-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap;}
+.btype-badge.detached{background:#F0EDE8;color:#6B6560;}
+.btype-badge.mansion{background:#EFF6FF;color:#1D4ED8;}
+.btype-note{font-size:11px;color:var(--text-hint);}
+@media print{header,.step-nav,.bottom-bar,.no-print{display:none!important;}body{background:#fff;}.main{padding:0;max-width:100%;}.step-page{display:block!important;}.panel,.ep-wrap{box-shadow:none;}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" onclick="goStep(1)" style="cursor:pointer;" title="トップへ戻る">
+    <div class="logo-icon">🏠</div>
+    <div><div class="logo-text">リフォーム見積くん</div><div class="logo-sub">REFORM ESTIMATE SYSTEM v2.0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="color:rgba(255,255,255,.5);font-size:12px;margin-right:4px;" id="hdr-date"></span>
+    <button class="hdr-btn" onclick="openHowto()">📖 使い方</button>
+    <button class="hdr-btn" onclick="openSettings()">⚙️ 設定</button>
+  </div>
+</header>
+
+<!-- 使い方ドロワー -->
+<div class="overlay" id="howto-ov" onclick="if(event.target===this)closeAll()">
+  <div class="drawer">
+    <div class="drw-hdr"><div class="drw-title">📖 使い方ガイド</div><button class="drw-close" onclick="closeAll()">✕</button></div>
+    <div class="drw-body">
+      <div class="ht-step"><div class="ht-num">1</div><div class="ht-ttl">お客様情報を入力する</div></div>
+      <ul class="ht-list"><li>お客様名・住所・電話番号を入力します</li><li>工事場所（例：キッチン・浴室）を記入します</li><li>見積番号は自動で採番されます</li><li>発行日・有効期限（30日後）が自動セットされます</li><li>担当者名・会社名は見積書に印刷されます</li></ul>
+      <div class="ht-step"><div class="ht-num">2</div><div class="ht-ttl">商品を選んで追加する</div></div>
+      <ul class="ht-list"><li>ベスト5商材はワンタップで即追加できます</li><li>メーカー→カテゴリ→商品の順で定価が自動セットされます</li><li>販売掛率・仕入れ掛率を入れると販売価格と粗利が計算されます</li><li>「追加」ボタンで明細一覧に追加されます</li></ul>
+      <div class="ht-step"><div class="ht-num">3</div><div class="ht-ttl">工事費・諸経費を入力する</div></div>
+      <ul class="ht-list"><li>工事費・撤去処分費・諸経費を入力します</li><li>右側の社内管理パネルに粗利額・粗利率がリアルタイム表示されます</li><li>粗利率が色で変化します（緑30%以上、黄20〜30%、赤20%未満）</li><li>「履歴に保存」で最大30件まで保存できます</li></ul>
+      <div class="ht-step"><div class="ht-num">4</div><div class="ht-ttl">見積書を出力する</div></div>
+      <ul class="ht-list"><li>「Excel出力」でお客様名入りのxlsxファイルをダウンロードできます（社内粗利情報も含まれます）</li><li>「印刷・PDF保存」でブラウザ印刷できます</li><li>利益パネルは印刷時に非表示になります</li></ul>
+      <div class="ht-tip">💡 画面下のバーに見積合計と粗利率が常に表示されます。「履歴」ボタンから過去の見積をいつでも呼び出せます。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 設定ドロワー -->
+<div class="overlay" id="settings-ov" onclick="if(event.target===this)closeAll()">
+  <div class="drawer">
+    <div class="drw-hdr"><div class="drw-title">⚙️ 設定</div><button class="drw-close" onclick="closeAll()">✕</button></div>
+    <div class="drw-body">
+      <div class="set-sec">🏢 会社基本情報</div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:10px;line-height:1.7;">ここに登録した情報は、見積作成時に自動でセットされます。毎回の入力が不要になります。</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="form-group"><label>会社名</label><input type="text" id="prof-company" placeholder="例）〇〇リフォーム株式会社"></div>
+        <div class="form-group"><label>担当者名</label><input type="text" id="prof-staff" placeholder="例）山田 太郎"></div>
+        <div class="form-group"><label>電話番号（会社）</label><input type="text" id="prof-tel" placeholder="例）048-000-0000"></div>
+        <div class="form-group"><label>郵便番号</label><input type="text" id="prof-zip" placeholder="例）330-0000"></div>
+        <div class="form-group"><label>住所</label><input type="text" id="prof-addr" placeholder="例）埼玉県さいたま市〇〇区〇〇 1-2-3"></div>
+        <div class="form-group"><label>メールアドレス</label><input type="text" id="prof-email" placeholder="例）info@example.co.jp"></div>
+        <div class="form-group full" style="grid-column:1/-1;">
+          <label>デフォルト備考文（見積書に毎回自動でセット）</label>
+          <textarea id="prof-biko" rows="3" style="width:100%;border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:8px 10px;font-size:12px;font-family:'Noto Sans JP',sans-serif;color:var(--text-main);background:var(--surface);outline:none;resize:vertical;line-height:1.6;" placeholder="例）・本見積書の有効期限は発行日より30日間とさせていただきます。"></textarea>
+        </div>
+      </div>
+      <button class="demo-btn" onclick="saveProfile()" style="margin-top:10px;border-color:#2E7D5E;color:#2E7D5E;">
+        <span class="demo-btn-icon">💾</span>
+        <div><div class="demo-btn-label">会社情報を保存</div><div class="demo-btn-desc">次回から自動でセットされます</div></div>
+      </button>
+      <div class="set-sec" style="margin-top:20px;">表示テーマ</div>
+      <div class="set-item">
+        <div><div class="set-lbl">ダークモード</div><div class="set-desc">画面を暗いテーマに切り替えます</div></div>
+        <label class="tgl-wrap"><input type="checkbox" id="dark-tgl" onchange="toggleDark()"><span class="tgl-track"></span></label>
+      </div>
+      <div class="set-sec" style="margin-top:20px;">仕入れ掛率（原価率）設定</div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:9px;line-height:1.7;">各メーカーの仕入れ掛率を設定してください。商品選択時に自動で適用されます。</div>
+      <div class="cr-row"><span class="cr-maker">🔵 LIXIL</span><input type="number" class="cr-input" id="cr-LIXIL" step="0.01" min="0.1" max="0.9" value="0.52"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
+      <div class="cr-row"><span class="cr-maker">🟢 TOTO</span><input type="number" class="cr-input" id="cr-TOTO" step="0.01" min="0.1" max="0.9" value="0.53"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
+      <div class="cr-row"><span class="cr-maker">🟠 タカラ</span><input type="number" class="cr-input" id="cr-タカラ" step="0.01" min="0.1" max="0.9" value="0.54"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
+      <div class="cr-row"><span class="cr-maker">⚪ その他</span><input type="number" class="cr-input" id="cr-その他" step="0.01" min="0.1" max="0.9" value="0.60"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
+      <div class="cr-row" style="margin-top:6px;border-top:1px solid var(--gray-border);padding-top:9px;"><span class="cr-maker">🔨 工事粗利率</span><input type="number" class="cr-input" id="cr-koji" step="1" min="0" max="99" value="35"><span style="font-size:11px;color:var(--text-hint)">%</span></div>
+      <button class="demo-btn" onclick="saveCostRates()" style="margin-top:10px;border-color:var(--copper);color:var(--copper);"><span class="demo-btn-icon">💾</span><div><div class="demo-btn-label">掛率設定を保存</div><div class="demo-btn-desc">ブラウザに記憶されます</div></div></button>
+      <div class="set-sec" style="margin-top:20px;">工事費テンプレート設定</div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:10px;line-height:1.7;">よく使う工事費の組み合わせを登録できます。STEP3でワンクリック呼び出し可能になります。</div>
+      <div id="koji-tpl-settings"></div>
+      <button class="demo-btn" onclick="addKojiTplSlot()" style="margin-bottom:4px;"><span class="demo-btn-icon">➕</span><div><div class="demo-btn-label">テンプレを追加</div><div class="demo-btn-desc">最大8セットまで登録できます</div></div></button>
+      <button class="demo-btn" onclick="saveKojiTpl()" style="border-color:var(--copper);color:var(--copper);"><span class="demo-btn-icon">💾</span><div><div class="demo-btn-label">テンプレを保存</div><div class="demo-btn-desc">ブラウザに記憶されます</div></div></button>
+      <div class="set-sec" style="margin-top:20px;">デモデータ</div>
+      <button class="demo-btn" onclick="loadDemo('kitchen')"><span class="demo-btn-icon">🍳</span><div><div class="demo-btn-label">キッチンリフォーム デモ</div><div class="demo-btn-desc">LIXIL リシェルSI + 工事費セット</div></div></button>
+      <button class="demo-btn" onclick="loadDemo('bathroom')"><span class="demo-btn-icon">🛁</span><div><div class="demo-btn-label">浴室リフォーム デモ</div><div class="demo-btn-desc">TOTO サザナ + 工事費セット</div></div></button>
+      <button class="demo-btn" onclick="loadDemo('toilet')"><span class="demo-btn-icon">🚽</span><div><div class="demo-btn-label">トイレリフォーム デモ</div><div class="demo-btn-desc">TOTO ネオレスト + 工事費セット</div></div></button>
+      <div class="set-sec" style="margin-top:20px;">データ管理</div>
+      <button class="clr-btn" onclick="clearAll()">🗑 すべてのデータをクリア</button>
+      <div class="clr-note">入力した内容・追加した商品がすべて消去されます<br>この操作は取り消せません</div>
+    </div>
+  </div>
+</div>
+
+<!-- 履歴モーダル -->
+<div class="modal-bg" id="hist-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:700px;">
+    <div class="modal-hdr">
+      <div class="modal-ttl">📂 過去見積の履歴</div>
+      <button class="modal-close" onclick="document.getElementById('hist-modal').classList.remove('open')">✕</button>
+    </div>
+    <div style="padding:10px 20px;border-bottom:1px solid var(--gray-border);background:var(--gray-subtle);">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="hist-search" placeholder="🔍 お客様名・見積NO・電話番号で検索" oninput="renderHistList()" style="flex:1;min-width:200px;height:36px;border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:0 12px;font-size:13px;font-family:'Noto Sans JP',sans-serif;color:var(--text-main);background:var(--surface);outline:none;">
+        <button class="btn btn-outline" style="height:36px;font-size:12px;padding:0 12px;white-space:nowrap;" onclick="el('hist-search').value='';renderHistList()">クリア</button>
+        <div style="font-size:11px;color:var(--text-hint);" id="hist-count"></div>
+      </div>
+    </div>
+    <div class="modal-body" id="hist-list"></div>
+  </div>
+</div>
+
+<!-- ベスト5カスタマイズモーダル -->
+<div class="modal-bg" id="b5-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:560px;">
+    <div class="modal-hdr"><div class="modal-ttl">⭐ ベスト5商材カスタマイズ</div><button class="modal-close" onclick="document.getElementById('b5-modal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--text-hint);margin-bottom:12px;line-height:1.7;">よく使う商材を5つまで登録できます。STEP2にワンタップ追加ボタンとして表示されます。</div>
+      <div id="b5-rows"></div>
+      <button class="btn btn-copper" onclick="saveB5()" style="width:100%;justify-content:center;margin-top:10px;">💾 保存する</button>
+    </div>
+  </div>
+</div>
+
+<nav class="step-nav">
+  <div class="step-nav-inner">
+    <div class="step-tab active" onclick="goStep(1)" id="tab1"><div class="step-num">1</div><span>お客様情報</span></div>
+    <div class="step-tab" onclick="goStep(2)" id="tab2"><div class="step-num">2</div><span>商品選択</span></div>
+    <div class="step-tab" onclick="goStep(3)" id="tab3"><div class="step-num">3</div><span>工事費</span></div>
+    <div class="step-tab" onclick="goStep(4)" id="tab4"><div class="step-num">4</div><span>見積書プレビュー</span></div>
+  </div>
+</nav>
+
+<main class="main">
+<!-- STEP1 -->
+<div class="step-page active" id="step1">
+  <div class="panel">
+    <div class="panel-title">お客様情報</div>
+    <div class="form-grid">
+      <div class="form-group"><label>お客様名</label><input type="text" id="c-name" placeholder="例）田中 花子 様"></div>
+      <div class="form-group"><label>電話番号</label><input type="text" id="c-tel" placeholder="090-0000-0000"></div>
+      <div class="form-group full"><label>住所</label><input type="text" id="c-addr" placeholder="例）埼玉県さいたま市〇〇区〇〇 1-2-3"></div>
+      <div class="form-group"><label>工事場所</label><input type="text" id="c-loc" placeholder="例）キッチン・浴室"></div>
+      <div class="form-group"><label>工事予定日</label><input type="date" id="c-wdate"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">見積情報</div>
+    <div class="form-grid three">
+      <div class="form-group"><label>見積番号</label><input type="text" id="e-no" placeholder="自動採番"></div>
+      <div class="form-group"><label>発行日</label><input type="date" id="e-issue"></div>
+      <div class="form-group"><label>有効期限</label><input type="date" id="e-expire"></div>
+      <div class="form-group"><label>担当者名</label><input type="text" id="e-staff" placeholder="例）山田 太郎"></div>
+      <div class="form-group"><label>会社名</label><input type="text" id="e-company" placeholder="例）〇〇リフォーム株式会社"></div>
+      <div class="form-group"><label>電話（会社）</label><input type="text" id="e-ctel" placeholder="0XX-XXXX-XXXX"></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;"><button class="btn btn-copper" onclick="goStep(2)">商品選択へ進む →</button></div>
+</div>
+
+<!-- STEP2 -->
+<div class="step-page" id="step2">
+  <div class="panel">
+
+    <!-- 建物タイプ選択 -->
+    <div class="btype-wrap">
+      <div class="btype-label">🏠 建物タイプ</div>
+      <div class="btype-toggle">
+        <button class="btype-btn detached active" id="btype-detached" onclick="setBtype('detached')">🏠 一戸建て</button>
+        <button class="btype-btn mansion" id="btype-mansion" onclick="setBtype('mansion')">🏢 マンション</button>
+      </div>
+      <div class="btype-note" id="btype-note">一戸建て用の商品を表示しています</div>
+    </div>
+
+    <div class="panel-title">よく使う商材ベスト5</div>
+    <div class="b5-wrap">
+      <div class="b5-hdr">
+        <div class="b5-ttl">⭐ ワンタップで追加 — <span id="b5-type-label">一戸建てセット</span></div>
+        <button class="b5-edit-btn" onclick="openB5Edit()">✏️ カスタマイズ</button>
+      </div>
+      <div class="b5-grid" id="b5-grid"></div>
+    </div>
+    <div class="panel-title">商品を追加</div>
+    <div class="prod-sel">
+      <div class="sel-row">
+        <div class="form-group"><label>メーカー</label><select id="s-maker" onchange="onMaker()"><option value="">選択</option><option>LIXIL</option><option>TOTO</option><option value="タカラ">タカラスタンダード</option><option value="その他">その他</option></select></div>
+        <div class="form-group"><label>カテゴリ</label><select id="s-cat" onchange="onCat()"><option value="">選択</option></select></div>
+        <div class="form-group"><label>商品</label><select id="s-prod" onchange="onProd()"><option value="">選択</option></select></div>
+        <div class="form-group"><label>定価（円）</label><input type="number" id="s-price" placeholder="0" oninput="calcPrev()"></div>
+        <div class="form-group"><label>販売掛率</label><input type="number" id="s-rate" placeholder="0.70" step="0.01" min="0.1" max="1" value="0.70" oninput="calcPrev()"></div>
+        <div class="form-group"><label>仕入れ掛率</label><input type="number" id="s-cr" placeholder="0.52" step="0.01" min="0.1" max="1" value="0.52" oninput="calcPrev()"></div>
+        <div class="form-group"><label>数量</label><input type="number" id="s-qty" placeholder="1" min="1" step="1" value="1" style="width:60px;"></div>
+        <div class="form-group" style="align-items:flex-end;"><button class="btn btn-copper" onclick="addProd()">追加</button></div>
+      </div>
+      <div class="sel-prev">
+        <div style="font-size:12px;color:var(--text-sub);">販売価格：<span id="pv-sell" style="color:var(--navy);">—</span> 円</div>
+        <div style="font-size:12px;color:var(--text-sub);">仕入れ原価：<span id="pv-cost">—</span> 円</div>
+        <div style="font-size:12px;color:var(--text-sub);">商品粗利：<span id="pv-profit" style="color:#2E7D5E;">—</span> 円</div>
+      </div>
+    </div>
+    <table class="item-table"><thead><tr><th>メーカー</th><th>カテゴリ</th><th>商品名・品番</th><th class="pc">定価</th><th class="pc">掛率</th><th class="pc">数量</th><th class="pc">販売価格</th><th></th></tr></thead>
+    <tbody id="prod-tb"><tr><td colspan="8"><div class="empty-st"><div style="font-size:28px;margin-bottom:6px;">📦</div><div>商品を追加してください</div></div></td></tr></tbody></table>
+  </div>
+  <div style="display:flex;justify-content:space-between;"><button class="btn btn-outline" onclick="goStep(1)">← 戻る</button><button class="btn btn-copper" onclick="goStep(3)">工事費へ進む →</button></div>
+</div>
+
+<!-- STEP3 -->
+<div class="step-page" id="step3">
+  <div class="panel">
+    <div class="panel-title">工事費・諸経費</div>
+    <div class="koji-tpl-wrap" id="koji-tpl-wrap">
+      <span style="font-size:11px;font-weight:700;color:var(--text-hint);align-self:center;margin-right:2px;">テンプレ呼び出し：</span>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 0.7fr 1fr auto;gap:8px;margin-bottom:4px;padding:0 2px;">
+      <div class="koji-row-lbl" style="text-align:left;font-size:11px;font-weight:500;color:var(--text-sub);">工事項目</div>
+      <div class="koji-row-lbl">数量</div>
+      <div class="koji-row-lbl">金額（円）</div>
+      <div></div>
+    </div>
+    <div id="koji-list">
+      <div class="koji-row"><input type="text" value="設置工事費"><input type="number" value="1" min="1" step="1"><input type="number" value="80000"><button class="del-btn" onclick="delKoji(this)">✕</button></div>
+      <div class="koji-row"><input type="text" value="既設品撤去処分費"><input type="number" value="1" min="1" step="1"><input type="number" value="25000"><button class="del-btn" onclick="delKoji(this)">✕</button></div>
+      <div class="koji-row"><input type="text" value="諸経費"><input type="number" value="1" min="1" step="1"><input type="number" value="15000"><button class="del-btn" onclick="delKoji(this)">✕</button></div>
+    </div>
+    <button class="btn btn-outline" onclick="addKoji()" style="margin-top:6px;">＋ 工事項目を追加</button>
+  </div>
+  <div class="panel">
+    <div class="panel-title">値引き</div>
+    <div class="form-grid">
+      <div class="form-group"><label>値引き額（円）</label><input type="number" id="discount" value="0" placeholder="0"></div>
+      <div class="form-group"><label>値引き理由（任意）</label><input type="text" id="disc-note" placeholder="例）キャンペーン値引き"></div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">備考</div>
+    <div style="font-size:11px;color:var(--text-hint);margin-bottom:8px;">見積書に印刷される備考欄です。自由に編集できます。</div>
+    <textarea id="備考" rows="4" style="width:100%;border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:10px;font-size:13px;font-family:'Noto Sans JP',sans-serif;color:var(--text-main);background:var(--surface);outline:none;resize:vertical;line-height:1.7;transition:border-color .15s;" onfocus="this.style.borderColor='var(--copper-light)'" onblur="this.style.borderColor='var(--gray-border)'">・本見積書の有効期限は発行日より30日間とさせていただきます。
+・工事内容の変更が生じた場合は別途ご相談となります。
+・商品の在庫状況により納期が変わる場合がございます。</textarea>
+  </div>
+  <div class="s3-grid">
+    <div class="sum-box">
+      <div class="sum-row"><span>商品合計</span><span class="sa" id="s-prod">¥0</span></div>
+      <div class="sum-row"><span>工事費合計</span><span class="sa" id="s-koji">¥0</span></div>
+      <div class="sum-row"><span>値引き</span><span class="sa" id="s-disc">−¥0</span></div>
+      <div class="sum-row"><span>小計（税抜）</span><span class="sa" id="s-sub">¥0</span></div>
+      <div class="sum-row"><span>消費税（10%）</span><span class="sa" id="s-tax" style="color:rgba(255,255,255,.6)">¥0</span></div>
+      <div class="sum-row tot"><span>お見積金額（税込）</span><span class="sa" id="s-total">¥0</span></div>
+    </div>
+    <div class="profit-panel">
+      <span class="pp-badge">社内管理 ・ 印刷非表示</span>
+      <div class="pm-card" id="pm-card" style="background:#1B5E3B;">
+        <div class="pm-lbl">粗利額（税抜ベース）</div>
+        <div class="pm-val" id="p-rieki">¥0</div>
+        <div class="pm-sub">商品粗利 ＋ 工事粗利</div>
+      </div>
+      <div class="pr-card">
+        <div class="pr-lbl">粗利率</div>
+        <div class="pr-val" id="p-rate">0.0%</div>
+        <div class="pr-track"><div class="pr-bar" id="p-bar" style="width:0%;background:#F4C97A;"></div></div>
+        <div class="pr-tgt">目標ライン：30%以上</div>
+      </div>
+      <div class="ps-grid">
+        <div class="ps-card"><div class="ps-lbl">商品粗利</div><div class="ps-val" id="p-ppro">¥0</div></div>
+        <div class="ps-card"><div class="ps-lbl">工事粗利</div><div class="ps-val" id="p-kpro">¥0</div></div>
+        <div class="ps-card"><div class="ps-lbl">商品原価合計</div><div class="ps-val" id="p-genka">¥0</div></div>
+        <div class="ps-card"><div class="ps-lbl">工事原価（推定）</div><div class="ps-val" id="p-kgenka">¥0</div></div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:4px;">
+    <button class="btn btn-outline" onclick="goStep(2)">← 戻る</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-hist" onclick="saveHist()">💾 履歴に保存</button>
+      <button class="btn btn-copper" onclick="buildPrev();goStep(4)">見積書プレビューへ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP4 -->
+<div class="step-page" id="step4">
+  <div class="ep-wrap" id="print-area">
+    <div class="ep-hdr"><div><div class="ep-title">御　見　積　書</div><div class="ep-no" id="ep-no"></div></div><div class="ep-client" id="ep-client"></div></div>
+    <div class="ep-body">
+      <table class="ep-tbl"><thead><tr><th style="width:40%">商品・工事内容</th><th>メーカー</th><th class="tr">定価</th><th class="tr">掛率</th><th class="tr">金額（税抜）</th></tr></thead><tbody id="ep-tb"></tbody></table>
+      <div class="ep-total-wrap"><div class="ep-total-box" id="ep-totals"></div></div>
+      <div class="ep-note" id="ep-note"></div>
+    </div>
+    <div class="ep-footer"><div id="ep-co"></div><div>リフォーム見積くん</div></div>
+  </div>
+  <div class="no-print" style="display:flex;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:8px;">
+    <button class="btn btn-outline" onclick="goStep(3)">← 戻る</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-excel" onclick="exportExcel()">📊 Excel出力</button>
+      <button class="btn btn-outline" onclick="window.print()">🖨 印刷・PDF保存</button>
+      <button class="btn-hist" onclick="saveHist();alert('履歴に保存しました！📂')">💾 履歴に保存</button>
+    </div>
+  </div>
+</div>
+</main>
+
+<div class="bottom-bar no-print">
+  <div class="bar-total-wrap">
+    <span class="bar-lbl">見積合計（税込）</span>
+    <span class="bar-amt" id="bar-total">¥0</span>
+    <span class="bar-tax">（税10%含む）</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div style="font-size:12px;color:var(--text-hint);" id="bar-info">商品 0件</div>
+    <button class="btn btn-outline" style="height:30px;font-size:12px;padding:0 10px;" onclick="openHist()">📂 履歴</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// 建物タイプ: 'detached'=一戸建て / 'mansion'=マンション
+let btype='detached';
+
+const MASTER={
+  LIXIL:{
+    キッチン:[
+      {name:"シエラS I型 1800mm",     code:"CS-I1800", price:480000, type:"both"},
+      {name:"シエラS I型 2100mm",     code:"CS-I2100", price:540000, type:"both"},
+      {name:"リシェルSI I型 2100mm",  code:"RS-I2100", price:980000, type:"both"},
+      {name:"ノクト I型 2550mm",      code:"NK-I2550", price:1280000,type:"detached"},
+      {name:"リシェルSI マンション用 1800mm",code:"RS-M1800",price:860000,type:"mansion"},
+    ],
+    浴室:[
+      {name:"スパージュ 1616 Bタイプ",code:"SP-1616B",price:580000,type:"detached"},
+      {name:"アライズ 1616 Cタイプ",  code:"AR-1616C",price:420000,type:"detached"},
+      {name:"キレイユ 1616",          code:"KY-1616", price:320000,type:"detached"},
+      {name:"リノビオV MNシリーズ 1216",code:"RNV-1216",price:380000,type:"mansion"},
+      {name:"リノビオV MNシリーズ 1316",code:"RNV-1316",price:420000,type:"mansion"},
+    ],
+    トイレ:[
+      {name:"サティスSタイプ",code:"YBC-S",price:165000,type:"both"},
+      {name:"サティスGタイプ",code:"YBC-G",price:128000,type:"both"},
+      {name:"ベーシアハーモL", code:"ZA10H",price:95000, type:"both"},
+    ],
+    洗面台:[
+      {name:"ルミシス 750mm",code:"LM-750",price:385000,type:"both"},
+      {name:"エスタ 750mm",  code:"ES-750",price:168000,type:"both"},
+    ],
+  },
+  TOTO:{
+    キッチン:[
+      {name:"ミッテ I型 1800mm",  code:"MT-I1800",price:520000,type:"both"},
+      {name:"クラッソ I型 2100mm",code:"CR-I2100",price:880000,type:"both"},
+    ],
+    浴室:[
+      {name:"サザナ Tタイプ 1616",          code:"SZ-1616T",price:450000,type:"detached"},
+      {name:"サザナ Sタイプ 1616",          code:"SZ-1616S",price:520000,type:"detached"},
+      {name:"マンションリモデルバスルーム 1216",code:"MR-1216", price:320000,type:"mansion"},
+      {name:"マンションリモデルバスルーム 1316",code:"MR-1316", price:360000,type:"mansion"},
+      {name:"マンションリモデルバスルーム 1418",code:"MR-1418", price:410000,type:"mansion"},
+    ],
+    トイレ:[
+      {name:"ネオレスト AH1",code:"CES9710",price:328000,type:"both"},
+      {name:"GG2 ZJ2",       code:"CES9898",price:198000,type:"both"},
+      {name:"ピュアレストQR",code:"CS230B", price:85000, type:"both"},
+    ],
+    洗面台:[
+      {name:"オクターブ 750mm",code:"OK-750",price:248000,type:"both"},
+      {name:"Vシリーズ 600mm", code:"VS-600",price:128000,type:"both"},
+    ],
+  },
+  タカラ:{
+    キッチン:[
+      {name:"トレーシア I型 2100mm",code:"TR-I2100",price:680000,type:"both"},
+      {name:"エーデル I型 1800mm",  code:"ED-I1800",price:480000,type:"both"},
+    ],
+    浴室:[
+      {name:"プレデンシア 1616",code:"PD-1616",price:580000,type:"detached"},
+      {name:"リラクシア 1616", code:"RL-1616",price:380000,type:"detached"},
+      {name:"ミーナ マンション用 1216",code:"MN-1216",price:360000,type:"mansion"},
+    ],
+    洗面台:[
+      {name:"エリーナ 750mm",code:"EL-750",price:195000,type:"both"},
+    ],
+  },
+  その他:{その他:[{name:"（手動入力）",code:"",price:0,type:"both"}]},
+};
+
+let products=[],costRates={LIXIL:0.52,TOTO:0.53,タカラ:0.54,その他:0.60},kojiPR=35;
+
+// ベスト5 — 一戸建てセット / マンションセット
+const DB5_DETACHED=[
+  {maker:"LIXIL",name:"リシェルSI I型 2100mm",  code:"RS-I2100",price:980000, rate:0.70,cr:0.52},
+  {maker:"TOTO", name:"サザナ Sタイプ 1616",    code:"SZ-1616S",price:520000, rate:0.72,cr:0.53},
+  {maker:"TOTO", name:"ネオレスト AH1",          code:"CES9710", price:328000, rate:0.65,cr:0.53},
+  {maker:"LIXIL",name:"サティスSタイプ",          code:"YBC-S",   price:165000, rate:0.65,cr:0.52},
+  {maker:"タカラ",name:"トレーシア I型 2100mm",  code:"TR-I2100",price:680000, rate:0.70,cr:0.54},
+];
+const DB5_MANSION=[
+  {maker:"LIXIL",name:"リノビオV MNシリーズ 1316", code:"RNV-1316",price:420000,rate:0.70,cr:0.52},
+  {maker:"TOTO", name:"マンションリモデル 1418",   code:"MR-1418", price:410000,rate:0.72,cr:0.53},
+  {maker:"LIXIL",name:"リシェルSI マンション用 1800mm",code:"RS-M1800",price:860000,rate:0.70,cr:0.52},
+  {maker:"TOTO", name:"ネオレスト AH1",            code:"CES9710", price:328000,rate:0.65,cr:0.53},
+  {maker:"TOTO", name:"ミッテ I型 1800mm",         code:"MT-I1800",price:520000,rate:0.70,cr:0.53},
+];
+let b5=[];
+const v=id=>(document.getElementById(id)||{value:""}).value||"";
+const el=id=>document.getElementById(id);
+const fmt=n=>"¥"+Math.round(n).toLocaleString();
+
+window.onload=()=>{
+  const t=new Date(),iso=d=>d.toISOString().split("T")[0];
+  const ex=new Date(t);ex.setDate(ex.getDate()+30);
+  const pad=n=>String(n).padStart(4,"0");
+  el("e-issue").value=iso(t);el("e-expire").value=iso(ex);el("c-wdate").value=iso(t);
+  el("e-no").value="EST-"+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate());
+  el("hdr-date").textContent=t.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
+  if(localStorage.getItem("darkMode")==="1"){document.body.classList.add("dark");el("dark-tgl").checked=true;}
+  loadCR();loadB5();applyProfile();loadKojiTpl();
+};
+
+function applyProfile(){
+  const p=JSON.parse(localStorage.getItem("companyProfile")||"{}");
+  if(p.company){const e=el("e-company");if(e&&!e.value)e.value=p.company;}
+  if(p.staff){const e=el("e-staff");if(e&&!e.value)e.value=p.staff;}
+  if(p.tel){const e=el("e-ctel");if(e&&!e.value)e.value=p.tel;}
+  if(p.biko){const e=el("備考");if(e&&e.value===e.defaultValue)e.value=p.biko;}
+}
+function loadProfileFields(){
+  const p=JSON.parse(localStorage.getItem("companyProfile")||"{}");
+  ["company","staff","tel","zip","addr","email"].forEach(k=>{const e=el("prof-"+k);if(e)e.value=p[k]||"";});
+  const b=el("prof-biko");if(b)b.value=p.biko||"";
+}
+function saveProfile(){
+  const p={};
+  ["company","staff","tel","zip","addr","email"].forEach(k=>{const e=el("prof-"+k);if(e)p[k]=e.value||"";});
+  const b=el("prof-biko");if(b)p.biko=b.value||"";
+  localStorage.setItem("companyProfile",JSON.stringify(p));
+  if(p.biko){const bk=el("備考");if(bk)bk.value=p.biko;}
+  alert("会社情報を保存しました 🏢\n次回から見積作成時に自動でセットされます！");
+  closeAll();
+}
+
+function openHowto(){el("howto-ov").classList.add("open");}
+function openSettings(){loadCR();loadProfileFields();el("settings-ov").classList.add("open");}
+function closeAll(){["howto-ov","settings-ov"].forEach(id=>el(id).classList.remove("open"));}
+function toggleDark(){const on=el("dark-tgl").checked;document.body.classList.toggle("dark",on);localStorage.setItem("darkMode",on?"1":"0");}
+function goStep(n){
+  document.querySelectorAll(".step-page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".step-tab").forEach(t=>{t.classList.remove("active","done");});
+  el("step"+n).classList.add("active");el("tab"+n).classList.add("active");
+  for(let i=1;i<n;i++)el("tab"+i).classList.add("done");
+  if(n===3)calcTotals();window.scrollTo(0,0);
+}
+
+function loadCR(){
+  const s=localStorage.getItem("costRates");if(s){try{costRates=JSON.parse(s);}catch(e){}}
+  const k=localStorage.getItem("kojiPR");if(k)kojiPR=parseFloat(k)||35;
+  ["LIXIL","TOTO","タカラ","その他"].forEach(m=>{const e=el("cr-"+m);if(e)e.value=costRates[m]||0.55;});
+  const ke=el("cr-koji");if(ke)ke.value=kojiPR;
+}
+function saveCostRates(){
+  ["LIXIL","TOTO","タカラ","その他"].forEach(m=>{const e=el("cr-"+m);if(e)costRates[m]=parseFloat(e.value)||0.55;});
+  const ke=el("cr-koji");if(ke)kojiPR=parseFloat(ke.value)||35;
+  localStorage.setItem("costRates",JSON.stringify(costRates));localStorage.setItem("kojiPR",kojiPR);
+  alert("仕入れ掛率を保存しました ✅");closeAll();
+}
+
+// ── 建物タイプ切り替え ──
+function setBtype(t){
+  btype=t;
+  const isM=(t==='mansion');
+  ['detached','mansion'].forEach(k=>{
+    const b=el('btype-'+k);
+    if(b){b.classList.toggle('active',k===t);b.classList.toggle('detached',k==='detached');b.classList.toggle('mansion',k==='mansion');}
+  });
+  el('btype-note').textContent=isM?'マンション専用・共通商品を表示しています':'一戸建て用・共通商品を表示しています';
+  el('b5-type-label').textContent=isM?'マンションセット':'一戸建てセット';
+  // カテゴリ・商品リストを再フィルタ
+  onMaker();
+  renderB5();
+}
+
+function loadB5(){
+  const s=localStorage.getItem("b5");
+  const raw=s?JSON.parse(s):{};
+  b5={
+    detached: raw.detached||[...DB5_DETACHED],
+    mansion:  raw.mansion ||[...DB5_MANSION],
+  };
+  renderB5();
+}
+function renderB5(){
+  const g=el("b5-grid");g.innerHTML="";
+  const items=b5[btype]||[];
+  for(let i=0;i<5;i++){
+    const it=items[i];
+    if(it&&it.name){
+      const sell=Math.round(it.price*it.rate);
+      const btn=document.createElement("button");btn.className="b5-card";btn.id="b5c"+i;
+      btn.innerHTML='<div class="b5-maker">'+it.maker+'</div><div class="b5-name">'+it.name+'</div><div class="b5-price">¥'+sell.toLocaleString()+'</div>';
+      btn.onclick=()=>addFromB5(i);g.appendChild(btn);
+    }else{
+      const d=document.createElement("div");d.className="b5-card empty";
+      d.innerHTML='<div class="b5-name" style="color:var(--text-hint)">未設定</div>';g.appendChild(d);
+    }
+  }
+}
+function addFromB5(i){
+  const items=b5[btype]||[];const it=items[i];if(!it)return;
+  const cr=costRates[it.maker]||it.cr||0.55;
+  const sell=Math.round(it.price*it.rate),genka=Math.round(it.price*cr);
+  products.push({maker:it.maker,cat:"ベスト5",name:it.name,code:it.code,price:it.price,rate:it.rate,sell,cr,genka,btype});
+  renderProds();updateBar();
+  const c=el("b5c"+i);if(c){c.classList.add("b5-flash");setTimeout(()=>c.classList.remove("b5-flash"),500);}
+}
+function openB5Edit(){
+  const rows=el("b5-rows");rows.innerHTML="";
+  const isM=(btype==='mansion');
+  const hdr=document.createElement("div");
+  hdr.innerHTML='<div style="font-size:12px;font-weight:700;color:'+(isM?'#2563EB':'var(--navy)')+';">'+(isM?'🏢 マンションセット':'🏠 一戸建てセット')+'を編集しています</div>';
+  hdr.style.marginBottom='10px';rows.appendChild(hdr);
+  const items=b5[btype]||[];
+  for(let i=0;i<5;i++){
+    const it=items[i]||{};const d=document.createElement("div");d.className="b5e-slot";
+    d.innerHTML='<div class="b5e-title">スロット '+(i+1)+'</div><div class="form-grid" style="margin-bottom:6px;"><div class="form-group"><label>メーカー</label><select id="b5m'+i+'">'+["LIXIL","TOTO","タカラ","その他"].map(m=>'<option value="'+m+'"'+(it.maker===m?" selected":"")+'>'+m+'</option>').join("")+'</select></div><div class="form-group"><label>品番</label><input type="text" id="b5c_'+i+'" value="'+(it.code||"")+'"></div></div><div class="form-group" style="margin-bottom:6px;"><label>商品名</label><input type="text" id="b5n'+i+'" value="'+(it.name||"")+'" placeholder="商品名を入力"></div><div class="form-grid three"><div class="form-group"><label>定価（円）</label><input type="number" id="b5p'+i+'" value="'+(it.price||0)+'"></div><div class="form-group"><label>販売掛率</label><input type="number" id="b5r'+i+'" value="'+(it.rate||0.70)+'" step="0.01"></div><div class="form-group"><label>仕入れ掛率</label><input type="number" id="b5k'+i+'" value="'+(it.cr||0.52)+'" step="0.01"></div></div>';
+    rows.appendChild(d);
+  }
+  el("b5-modal").classList.add("open");
+}
+function saveB5(){
+  const items=[];
+  for(let i=0;i<5;i++){items.push({maker:el("b5m"+i).value,name:el("b5n"+i).value,code:el("b5c_"+i).value,price:parseFloat(el("b5p"+i).value)||0,rate:parseFloat(el("b5r"+i).value)||0.70,cr:parseFloat(el("b5k"+i).value)||0.52});}
+  b5[btype]=items;
+  localStorage.setItem("b5",JSON.stringify(b5));renderB5();el("b5-modal").classList.remove("open");
+  alert((btype==='mansion'?'🏢 マンション':'🏠 一戸建て')+'セットを保存しました ⭐');
+}
+
+function onMaker(){
+  const m=el("s-maker").value,cs=el("s-cat");cs.innerHTML='<option value="">選択</option>';
+  el("s-prod").innerHTML='<option value="">選択</option>';
+  if(m&&MASTER[m])Object.keys(MASTER[m]).forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;cs.appendChild(o);});
+  el("s-cr").value=costRates[m]||0.55;calcPrev();
+}
+function onCat(){
+  const m=el("s-maker").value,c=el("s-cat").value,ps=el("s-prod");ps.innerHTML='<option value="">選択</option>';
+  el("s-price").value="";
+  if(!m||!c||!MASTER[m]||!MASTER[m][c])return;
+  // 建物タイプでフィルタ（both は常に表示）
+  const filtered=MASTER[m][c].filter(p=>p.type==='both'||p.type===btype);
+  filtered.forEach((p,i)=>{
+    const o=document.createElement("option");o.value=i;
+    o.textContent=p.name+(p.code?" ("+p.code+")":"")+(p.type!=='both'?(" ★"+(btype==='mansion'?'M':'戸')):"");
+    ps.appendChild(o);
+  });
+  el("s-prod")._filtered=filtered;
+}
+function onProd(){
+  const m=el("s-maker").value,c=el("s-cat").value,i=el("s-prod").value;
+  if(i===""||!m||!c)return;
+  const filtered=el("s-prod")._filtered||MASTER[m][c];
+  const p=filtered[i];if(!p)return;
+  el("s-price").value=p.price;el("s-cr").value=costRates[m]||0.55;calcPrev();
+}
+function calcPrev(){
+  const price=parseFloat(el("s-price").value)||0,rate=parseFloat(el("s-rate").value)||0,cr=parseFloat(el("s-cr").value)||0;
+  const qty=parseFloat(el("s-qty").value)||1;
+  const unitSell=Math.round(price*rate),cost=Math.round(price*cr),profit=unitSell-cost;
+  el("pv-sell").textContent=unitSell>0?(qty>1?unitSell.toLocaleString()+" × "+qty+" = "+(unitSell*qty).toLocaleString():unitSell.toLocaleString()):"—";
+  el("pv-cost").textContent=cost>0?cost.toLocaleString():"—";
+  if(unitSell>0){el("pv-profit").textContent=(profit*qty).toLocaleString();el("pv-profit").style.color=profit>=0?"#2E7D5E":"#c0392b";}
+  else el("pv-profit").textContent="—";
+}
+function addProd(){
+  const m=el("s-maker").value,c=el("s-cat").value,idx=el("s-prod").value;
+  const price=parseFloat(el("s-price").value)||0,rate=parseFloat(el("s-rate").value)||0.7;
+  const cr=parseFloat(el("s-cr").value)||(costRates[m]||0.55);
+  const qty=Math.max(1,parseInt(el("s-qty").value)||1);
+  if(!m){alert("メーカーを選択してください");return;}if(!price){alert("定価を入力してください");return;}
+  const filtered=el("s-prod")._filtered||(m&&c&&MASTER[m]&&MASTER[m][c]?MASTER[m][c]:[]);
+  let name="カスタム商品",code="";
+  if(idx!==""&&filtered[idx]){name=filtered[idx].name;code=filtered[idx].code||"";}
+  const unitSell=Math.round(price*rate),unitGenka=Math.round(price*cr);
+  const sell=unitSell*qty,genka=unitGenka*qty;
+  products.push({maker:m,cat:c||"その他",name,code,price,rate,sell,cr,genka,btype,qty,unitSell,unitGenka});
+  el("s-qty").value="1";
+  renderProds();updateBar();
+}
+function renderProds(){
+  const tb=el("prod-tb");
+  if(!products.length){tb.innerHTML='<tr><td colspan="8"><div class="empty-st"><div style="font-size:28px;margin-bottom:6px;">📦</div><div>商品を追加してください</div></div></td></tr>';return;}
+  tb.innerHTML=products.map((p,i)=>{
+    const qty=p.qty||1;
+    const profit=p.sell-(p.genka||0),pc=profit>=0?"#2E7D5E":"#c0392b";
+    const bc=p.maker==="LIXIL"?"bl":p.maker==="TOTO"?"bt":p.maker==="タカラ"?"bk":"bo";
+    return '<tr>'
+      +'<td><span class="bdg '+bc+'">'+p.maker+'</span></td>'
+      +'<td style="color:var(--text-sub)">'+p.cat+'</td>'
+      +'<td><div style="font-weight:500">'+p.name+'</div>'+(p.code?'<div style="font-size:11px;color:var(--text-hint)">'+p.code+'</div>':'')+'</td>'
+      +'<td class="pc" style="color:var(--text-hint)">¥'+(p.unitSell||p.sell).toLocaleString()+'</td>'
+      +'<td class="pc" style="color:var(--text-sub)">'+(p.rate*100).toFixed(0)+'%</td>'
+      +'<td class="pc"><div class="qty-cell" style="justify-content:flex-end;">'
+        +'<button class="qty-btn" onclick="changeQty('+i+',-1)">−</button>'
+        +'<span class="qty-num">'+qty+'</span>'
+        +'<button class="qty-btn" onclick="changeQty('+i+',1)">＋</button>'
+      +'</div></td>'
+      +'<td class="pc"><div style="font-weight:500">¥'+p.sell.toLocaleString()+'</div>'
+        +(qty>1?'<div style="font-size:11px;color:var(--text-hint)">'+qty+'台×¥'+(p.unitSell||0).toLocaleString()+'</div>':'')
+        +'<div style="font-size:11px;color:'+pc+';font-weight:500;margin-top:1px;">粗利 ¥'+profit.toLocaleString()+'</div>'
+      +'</td>'
+      +'<td><button class="del-btn" onclick="delProd('+i+')">✕</button></td>'
+      +'</tr>';
+  }).join("");
+}
+function changeQty(i,delta){
+  const p=products[i];if(!p)return;
+  const newQty=Math.max(1,(p.qty||1)+delta);
+  p.qty=newQty;
+  p.sell=(p.unitSell||Math.round(p.price*p.rate))*newQty;
+  p.genka=(p.unitGenka||Math.round(p.price*p.cr))*newQty;
+  renderProds();updateBar();
+}
+function delProd(i){products.splice(i,1);renderProds();updateBar();}
+function addKoji(){
+  const r=document.createElement("div");r.className="koji-row";
+  r.innerHTML='<input type="text" placeholder="工事項目"><input type="number" value="1" min="1" step="1" style="width:100%;"><input type="number" placeholder="金額"><button class="del-btn" onclick="delKoji(this)">✕</button>';
+  el("koji-list").appendChild(r);
+}
+function delKoji(btn){btn.closest(".koji-row").remove();calcTotals();}
+function getKojiSum(){
+  let s=0;
+  document.querySelectorAll(".koji-row").forEach(r=>{
+    const ins=r.querySelectorAll('input[type="number"]');
+    if(ins.length>=2){
+      const qty=parseFloat(ins[0].value)||1;
+      const amt=parseFloat(ins[1].value)||0;
+      s+=qty*amt;
+    }
+  });
+  return s;
+}
+
+// ── 工事費テンプレート ──
+const DEFAULT_KOJI_TPL=[
+  {name:"キッチン 一戸建て",items:[["設置工事費",1,120000],["既設品撤去処分費",1,35000],["給排水工事費",1,45000],["諸経費",1,20000]]},
+  {name:"キッチン マンション",items:[["設置工事費",1,100000],["既設品撤去処分費",1,30000],["給排水工事費",1,40000],["搬入養生費",1,15000],["諸経費",1,15000]]},
+  {name:"浴室 一戸建て",  items:[["解体工事費",1,80000],["設置工事費",1,100000],["給排水工事費",1,30000],["諸経費",1,15000]]},
+  {name:"浴室 マンション",items:[["解体工事費",1,70000],["設置工事費",1,90000],["給排水工事費",1,30000],["搬入養生費",1,15000],["諸経費",1,15000]]},
+  {name:"トイレ 標準",    items:[["設置工事費",1,45000],["既設品撤去処分費",1,15000],["諸経費",1,8000]]},
+  {name:"洗面台 標準",    items:[["設置工事費",1,35000],["既設品撤去処分費",1,12000],["諸経費",1,8000]]},
+];
+let kojiTpls=[];
+
+function loadKojiTpl(){
+  const s=localStorage.getItem("kojiTpl");
+  kojiTpls=s?JSON.parse(s):[...DEFAULT_KOJI_TPL];
+  renderKojiTplButtons();
+  renderKojiTplSettings();
+}
+function renderKojiTplButtons(){
+  const wrap=el("koji-tpl-wrap");if(!wrap)return;
+  const existing=wrap.querySelectorAll(".koji-tpl-btn");existing.forEach(b=>b.remove());
+  kojiTpls.forEach((t,i)=>{
+    const b=document.createElement("button");b.className="koji-tpl-btn";b.textContent=t.name;
+    b.onclick=()=>applyKojiTpl(i);wrap.appendChild(b);
+  });
+}
+function applyKojiTpl(i){
+  const tpl=kojiTpls[i];if(!tpl)return;
+  const kl=el("koji-list");kl.innerHTML="";
+  tpl.items.forEach(([label,qty,amt])=>{
+    const r=document.createElement("div");r.className="koji-row";
+    r.innerHTML='<input type="text" value="'+label+'"><input type="number" value="'+qty+'" min="1" step="1"><input type="number" value="'+amt+'"><button class="del-btn" onclick="delKoji(this)">✕</button>';
+    kl.appendChild(r);
+  });
+  calcTotals();
+}
+function renderKojiTplSettings(){
+  const wrap=el("koji-tpl-settings");if(!wrap)return;
+  wrap.innerHTML=kojiTpls.map((t,i)=>`
+    <div style="border:1px solid var(--gray-border);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <input type="text" id="ktname-${i}" value="${t.name}" style="flex:1;height:32px;font-size:12px;" placeholder="テンプレ名">
+        <button style="height:32px;padding:0 10px;background:none;border:1px solid #FECACA;color:#B91C1C;border-radius:var(--r-sm);font-size:11px;cursor:pointer;" onclick="delKojiTpl(${i})">削除</button>
+      </div>
+      <div id="ktitems-${i}">
+        ${t.items.map((it,j)=>`<div style="display:grid;grid-template-columns:1fr 0.5fr 1fr auto;gap:5px;margin-bottom:5px;">
+          <input type="text" id="kti-${i}-${j}-0" value="${it[0]}" style="font-size:11px;height:30px;" placeholder="項目名">
+          <input type="number" id="kti-${i}-${j}-1" value="${it[1]}" min="1" style="font-size:11px;height:30px;">
+          <input type="number" id="kti-${i}-${j}-2" value="${it[2]}" style="font-size:11px;height:30px;" placeholder="金額">
+          <button style="height:30px;padding:0 7px;background:none;border:1px solid var(--gray-border);color:var(--text-hint);border-radius:4px;cursor:pointer;font-size:12px;" onclick="this.closest('div').remove()">✕</button>
+        </div>`).join("")}
+      </div>
+      <button style="font-size:11px;padding:3px 10px;background:none;border:1px solid var(--gray-border);border-radius:4px;cursor:pointer;color:var(--text-sub);font-family:'Noto Sans JP',sans-serif;" onclick="addKojiTplItem(${i})">＋ 項目追加</button>
+    </div>`).join("");
+}
+function addKojiTplItem(i){
+  const wrap=el("ktitems-"+i);if(!wrap)return;
+  const j=wrap.children.length;
+  const d=document.createElement("div");
+  d.style="display:grid;grid-template-columns:1fr 0.5fr 1fr auto;gap:5px;margin-bottom:5px;";
+  d.innerHTML='<input type="text" id="kti-'+i+'-'+j+'-0" style="font-size:11px;height:30px;" placeholder="項目名"><input type="number" id="kti-'+i+'-'+j+'-1" value="1" min="1" style="font-size:11px;height:30px;"><input type="number" id="kti-'+i+'-'+j+'-2" style="font-size:11px;height:30px;" placeholder="金額"><button style="height:30px;padding:0 7px;background:none;border:1px solid var(--gray-border);color:var(--text-hint);border-radius:4px;cursor:pointer;font-size:12px;" onclick="this.closest(\'div\').remove()">✕</button>';
+  wrap.appendChild(d);
+}
+function addKojiTplSlot(){
+  kojiTpls.push({name:"新規テンプレ "+(kojiTpls.length+1),items:[["設置工事費",1,50000],["諸経費",1,10000]]});
+  renderKojiTplSettings();
+}
+function delKojiTpl(i){
+  if(!confirm("このテンプレを削除しますか？"))return;
+  kojiTpls.splice(i,1);renderKojiTplSettings();
+}
+function saveKojiTpl(){
+  const saved=[];
+  kojiTpls.forEach((t,i)=>{
+    const nameEl=el("ktname-"+i);const name=nameEl?nameEl.value:t.name;
+    const itemsWrap=el("ktitems-"+i);const items=[];
+    if(itemsWrap){
+      Array.from(itemsWrap.children).forEach(row=>{
+        const ins=row.querySelectorAll("input");
+        if(ins.length>=3){
+          const label=ins[0].value,qty=parseFloat(ins[1].value)||1,amt=parseFloat(ins[2].value)||0;
+          if(label||amt)items.push([label,qty,amt]);
+        }
+      });
+    }
+    if(name)saved.push({name,items});
+  });
+  kojiTpls=saved;
+  localStorage.setItem("kojiTpl",JSON.stringify(kojiTpls));
+  renderKojiTplButtons();
+  alert("工事費テンプレを保存しました 🔨");closeAll();
+}
+
+function calcTotals(){
+  const ps=products.reduce((s,p)=>s+p.sell,0),gs=products.reduce((s,p)=>s+(p.genka||0),0),ks=getKojiSum();
+  const disc=parseFloat(el("discount").value)||0,sub=ps+ks-disc,tax=Math.round(sub*.1),total=sub+tax;
+  const kg=Math.round(ks*(1-kojiPR/100)),kp=ks-kg,pp=ps-gs,tp=pp+kp,pr=sub>0?(tp/sub*100):0;
+  el("s-prod").textContent=fmt(ps);el("s-koji").textContent=fmt(ks);el("s-disc").textContent="−"+fmt(disc);
+  el("s-sub").textContent=fmt(sub);el("s-tax").textContent=fmt(tax);el("s-total").textContent=fmt(total);
+  el("p-rieki").textContent=fmt(tp);el("p-rate").textContent=pr.toFixed(1)+"%";
+  el("p-ppro").textContent=fmt(pp);el("p-kpro").textContent=fmt(kp);el("p-genka").textContent=fmt(gs);el("p-kgenka").textContent=fmt(kg);
+  const bar=el("p-bar");bar.style.width=Math.min(Math.max(pr,0),100)+"%";
+  const mc=el("pm-card");
+  if(tp<0){mc.style.background="#7F1D1D";bar.style.background="#F09595";}
+  else if(pr<20){mc.style.background="#78350F";bar.style.background="#FAC775";}
+  else if(pr<30){mc.style.background="#854D0E";bar.style.background="#F4C97A";}
+  else{mc.style.background="#1B5E3B";bar.style.background="#5DCAA5";}
+  updateBar(total,pr);
+}
+function updateBar(total,pr){
+  if(total===undefined){const ps=products.reduce((s,p)=>s+p.sell,0);total=ps+Math.round(ps*.1);pr=undefined;}
+  el("bar-total").textContent="¥"+Math.round(total).toLocaleString();
+  el("bar-info").textContent="商品 "+products.length+"件"+(pr!==undefined?"　粗利率 "+pr.toFixed(1)+"%":"");
+}
+
+function buildPrev(){
+  calcTotals();
+  const estNo=v("e-no"),iss=v("e-issue"),exp=v("e-expire");
+  const btypeLabel=btype==='mansion'?'🏢 マンション':'🏠 一戸建て';
+  el("ep-no").textContent="見積番号："+estNo+"　発行日："+iss+"　有効期限："+exp+"　"+btypeLabel;
+  el("ep-client").innerHTML="<strong>"+(v("c-name")||"—")+"</strong><br>"+(v("c-addr")||"—")+"<br>"+v("c-tel")+"<br><br>工事予定日："+(v("c-wdate")||"—");
+  const co=v("e-company"),ct=v("e-ctel"),st=v("e-staff");
+  el("ep-co").innerHTML=co+(ct?"　"+ct:"")+(st?"　担当："+st:"");
+  const bikoRaw=el("備考").value||"";
+  el("ep-note").innerHTML="【備考】<br>"+bikoRaw.replace(/\n/g,"<br>");
+  let rows="";
+  products.forEach(p=>{
+    const qty=p.qty||1;
+    const qtyLabel=qty>1?" × "+qty+"台":"";
+    rows+="<tr><td>"+p.name+(p.code?"<br><span style='font-size:11px;color:var(--text-hint)'>"+p.code+"</span>":"")+(qtyLabel?"<span style='font-size:11px;color:var(--copper)'>"+qtyLabel+"</span>":"")+"</td><td>"+p.maker+"</td><td class='tr'>¥"+(p.unitSell||p.sell).toLocaleString()+"</td><td class='tr'>"+(p.rate*100).toFixed(0)+"%</td><td class='tr' style='font-weight:500'>¥"+p.sell.toLocaleString()+"</td></tr>";
+  });
+  document.querySelectorAll(".koji-row").forEach(r=>{
+    const ins=r.querySelectorAll("input");
+    if(ins.length>=3){
+      const l=ins[0].value,qty=parseFloat(ins[1].value)||1,a=parseFloat(ins[2].value)||0;
+      if(a>0){const total=qty*a;rows+="<tr><td>"+l+(qty>1?" × "+qty+"式":"")+"</td><td colspan='3' style='color:var(--text-hint)'>工事費</td><td class='tr'>¥"+total.toLocaleString()+"</td></tr>";}
+    } else if(ins.length>=2){
+      const l=ins[0].value,a=parseFloat(ins[1].value)||0;
+      if(a>0)rows+="<tr><td>"+l+"</td><td colspan='3' style='color:var(--text-hint)'>工事費</td><td class='tr'>¥"+a.toLocaleString()+"</td></tr>";
+    }
+  });
+  el("ep-tb").innerHTML=rows;
+  const ps=products.reduce((s,p)=>s+p.sell,0),ks=getKojiSum(),disc=parseFloat(el("discount").value)||0,dn=v("disc-note");
+  const sub=ps+ks-disc,tax=Math.round(sub*.1),tot=sub+tax;
+  let th="<div class='epr'><span>商品合計</span><span>¥"+ps.toLocaleString()+"</span></div><div class='epr'><span>工事費合計</span><span>¥"+ks.toLocaleString()+"</span></div>";
+  if(disc>0)th+="<div class='epr'><span>値引き"+(dn?"（"+dn+"）":"")+"</span><span>−¥"+disc.toLocaleString()+"</span></div>";
+  th+="<div class='epr'><span>小計（税抜）</span><span>¥"+sub.toLocaleString()+"</span></div><div class='epr'><span>消費税（10%）</span><span>¥"+tax.toLocaleString()+"</span></div><div class='epr grand'><span>お見積金額（税込）</span><span>¥"+tot.toLocaleString()+"</span></div>";
+  el("ep-totals").innerHTML=th;
+}
+
+function getSnap(){
+  let koji=[];
+  document.querySelectorAll(".koji-row").forEach(r=>{
+    const ins=r.querySelectorAll("input");
+    if(ins.length>=3){koji.push({label:ins[0].value,qty:parseFloat(ins[1].value)||1,amt:parseFloat(ins[2].value)||0});}
+    else if(ins.length>=2){koji.push({label:ins[0].value,qty:1,amt:parseFloat(ins[1].value)||0});}
+  });
+  const ps=products.reduce((s,p)=>s+p.sell,0),ks=koji.reduce((s,k)=>s+(k.qty||1)*k.amt,0),disc=parseFloat(v("discount"))||0,sub=ps+ks-disc;
+  return{id:Date.now(),savedAt:new Date().toLocaleString("ja-JP"),
+    clientName:v("c-name")||"（未入力）",clientTel:v("c-tel"),clientAddress:v("c-addr"),workLocation:v("c-loc"),workDate:v("c-wdate"),
+    estimateNo:v("e-no"),issueDate:v("e-issue"),expireDate:v("e-expire"),staffName:v("e-staff"),companyName:v("e-company"),companyTel:v("e-ctel"),
+    products:JSON.parse(JSON.stringify(products)),kojiItems:koji,discount:disc,discountNote:v("disc-note"),
+    biko:el("備考")?el("備考").value:"",btype,total:sub+Math.round(sub*.1)};
+}
+function saveHist(){
+  const snap=getSnap();
+  if(!snap.products.length){alert("商品が1件もありません。\n商品を追加してから保存してください。");return;}
+  let h=JSON.parse(localStorage.getItem("estH")||"[]");h.unshift(snap);if(h.length>30)h=h.slice(0,30);localStorage.setItem("estH",JSON.stringify(h));
+}
+function openHist(){
+  el("hist-search").value="";
+  renderHistList();
+  el("hist-modal").classList.add("open");
+}
+function renderHistList(){
+  const list=el("hist-list");
+  const all=JSON.parse(localStorage.getItem("estH")||"[]");
+  const q=(el("hist-search").value||"").trim().toLowerCase();
+  const h=q?all.filter(e=>(e.clientName||"").toLowerCase().includes(q)||(e.estimateNo||"").toLowerCase().includes(q)||(e.clientTel||"").toLowerCase().includes(q)):all;
+  const cnt=el("hist-count");
+  if(cnt)cnt.textContent=all.length+"件中 "+h.length+"件表示";
+  if(!all.length){
+    list.innerHTML='<div class="hist-empty">📂 保存された見積はありません<br><span style="font-size:11px;">STEP3 または STEP4 の「履歴に保存」ボタンで保存できます</span></div>';return;
+  }
+  if(!h.length){
+    list.innerHTML='<div class="hist-empty">🔍 「'+q+'」に一致する見積が見つかりませんでした</div>';return;
+  }
+  list.innerHTML=h.map((e,i)=>{
+    const realIdx=all.indexOf(e);
+    const btypeBadge=e.btype==='mansion'?'<span style="font-size:10px;background:#EFF6FF;color:#1D4ED8;border-radius:4px;padding:1px 6px;margin-left:4px;">🏢 マンション</span>':'<span style="font-size:10px;background:#F0EDE8;color:#6B6560;border-radius:4px;padding:1px 6px;margin-left:4px;">🏠 一戸建て</span>';
+    return '<div style="border:1px solid var(--gray-border);border-radius:var(--r-md);padding:13px 15px;margin-bottom:10px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;">'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="font-size:14px;font-weight:700;color:var(--text-main);">'+e.clientName+(e.clientTel?'<span style="font-size:11px;color:var(--text-hint);font-weight:400;margin-left:8px;">📞 '+e.clientTel+'</span>':'')+'</div>'
+      +'<div style="font-size:11px;color:var(--text-hint);margin-top:3px;">見積NO：'+e.estimateNo+'　'+e.workLocation+btypeBadge+'　保存：'+e.savedAt+'</div>'
+      +'<div style="font-size:11px;color:var(--text-hint);margin-top:2px;">商品 '+(e.products||[]).length+'件　工事費 '+(e.kojiItems||[]).filter(k=>k.amt>0).length+'項目</div>'
+      +'</div>'
+      +'<div style="font-size:16px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap;">¥'+(e.total||0).toLocaleString()+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:7px;flex-wrap:wrap;">'
+      +'<button style="flex:1;min-width:120px;height:34px;background:var(--copper);color:#fff;border:none;border-radius:var(--r-sm);font-family:\'Noto Sans JP\',sans-serif;font-size:12px;font-weight:500;cursor:pointer;" onclick="copyHist('+realIdx+')">📋 新しい見積として複製</button>'
+      +'<button style="flex:1;min-width:100px;height:34px;background:none;border:1px solid var(--gray-border);color:var(--text-sub);border-radius:var(--r-sm);font-family:\'Noto Sans JP\',sans-serif;font-size:12px;cursor:pointer;" onclick="loadHist('+realIdx+')">✏️ そのまま編集</button>'
+      +'<button style="height:34px;padding:0 10px;background:none;border:1px solid #FECACA;color:#B91C1C;border-radius:var(--r-sm);font-family:\'Noto Sans JP\',sans-serif;font-size:12px;cursor:pointer;" onclick="delHist(event,'+realIdx+')">削除</button>'
+      +'</div>'
+      +'</div>';
+  }).join("");
+}
+
+// 新しい見積として複製（お客様情報・見積番号・日付をリセット）
+function copyHist(i){
+  const h=JSON.parse(localStorage.getItem("estH")||"[]"),e=h[i];if(!e)return;
+  const t=new Date(),iso=d=>d.toISOString().split("T")[0];
+  const ex=new Date(t);ex.setDate(ex.getDate()+30);
+  const pad=n=>String(n).padStart(4,"0");
+  // 商品・工事費・値引き・備考はそのままコピー
+  products=e.products?JSON.parse(JSON.stringify(e.products)):[];renderProds();
+  const kl=el("koji-list");kl.innerHTML="";
+  (e.kojiItems||[]).forEach(k=>{const r=document.createElement("div");r.className="koji-row";const qty=k.qty||1;r.innerHTML='<input type="text" value="'+k.label+'"><input type="number" value="'+qty+'" min="1" step="1"><input type="number" value="'+k.amt+'"><button class="del-btn" onclick="delKoji(this)">✕</button>';kl.appendChild(r);});
+  const s=(id,val)=>{const elem=el(id);if(elem)elem.value=val||"";};
+  s("discount",e.discount);s("disc-note",e.discountNote);
+  if(e.備考||e.biko){const bk=el("備考");if(bk)bk.value=e.備考||e.biko||"";}
+  // お客様情報はクリア
+  s("c-name","");s("c-tel","");s("c-addr","");s("c-loc",e.workLocation||"");s("c-wdate",iso(new Date(t.getTime()+14*86400000)));
+  // 見積番号は新規採番（末尾に -C 付与）
+  const newNo="EST-"+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate())+"-C";
+  s("e-no",newNo);s("e-issue",iso(t));s("e-expire",iso(ex));
+  // 担当者・会社情報は引き継ぐ
+  s("e-staff",e.staffName);s("e-company",e.companyName);s("e-ctel",e.companyTel);
+  // 建物タイプも引き継ぐ
+  if(e.btype)setBtype(e.btype);
+  updateBar();el("hist-modal").classList.remove("open");
+  goStep(1);
+  alert("複製しました！\nお客様名・住所・電話番号を入力してください 📋\n商品・工事費の内容はそのまま引き継がれています。");
+}
+
+// そのまま上書き編集
+function loadHist(i){
+  const h=JSON.parse(localStorage.getItem("estH")||"[]"),e=h[i];if(!e)return;
+  if(!confirm("「"+e.clientName+"」の見積を読み込みます。\n現在の入力内容は上書きされます。よろしいですか？"))return;
+  const s=(id,val)=>{const elem=el(id);if(elem)elem.value=val||"";};
+  s("c-name",e.clientName);s("c-tel",e.clientTel);s("c-addr",e.clientAddress);s("c-loc",e.workLocation);s("c-wdate",e.workDate);
+  s("e-no",e.estimateNo);s("e-issue",e.issueDate);s("e-expire",e.expireDate);
+  s("e-staff",e.staffName);s("e-company",e.companyName);s("e-ctel",e.companyTel);
+  s("discount",e.discount);s("disc-note",e.discountNote);
+  if(e.備考||e.biko){const bk=el("備考");if(bk)bk.value=e.備考||e.biko||"";}
+  products=e.products?JSON.parse(JSON.stringify(e.products)):[];renderProds();
+  const kl=el("koji-list");kl.innerHTML="";
+  (e.kojiItems||[]).forEach(k=>{const r=document.createElement("div");r.className="koji-row";const qty=k.qty||1;r.innerHTML='<input type="text" value="'+k.label+'"><input type="number" value="'+qty+'" min="1" step="1"><input type="number" value="'+k.amt+'"><button class="del-btn" onclick="delKoji(this)">✕</button>';kl.appendChild(r);});
+  if(e.btype)setBtype(e.btype);
+  updateBar();el("hist-modal").classList.remove("open");goStep(1);alert("読み込み完了！内容を確認してください 📋");
+}
+function delHist(e,i){e.stopPropagation();if(!confirm("この履歴を削除しますか？"))return;let h=JSON.parse(localStorage.getItem("estH")||"[]");h.splice(i,1);localStorage.setItem("estH",JSON.stringify(h));renderHistList();}
+
+function exportExcel(){
+  if(typeof XLSX==="undefined"){alert("ライブラリ読み込み中です。少し待ってから再度お試しください。");return;}
+  buildPrev();
+  const cn=v("c-name")||"—",estNo=v("e-no"),iss=v("e-issue"),st=v("e-staff"),co=v("e-company"),ct=v("e-ctel");
+  const wb=XLSX.utils.book_new(),d=[];
+  d.push(["御　見　積　書","","","","",""]);d.push(["","","","","",""]);
+  d.push(["見積番号",estNo,"","発行日",iss,""]);d.push(["お客様名",cn,"","担当者",st,""]);d.push(["工事場所",v("c-loc"),"","工事予定日",v("c-wdate"),""]);
+  d.push(["","","","","",""]);d.push(["商品・工事内容","メーカー","定価（円）","掛率","販売価格","粗利"]);
+  products.forEach(p=>{
+    const qty=p.qty||1;
+    d.push([p.name+(p.code?" ("+p.code+")":"")+(qty>1?" × "+qty+"台":""),p.maker,p.unitSell||p.sell,(p.rate*100).toFixed(0)+"%",p.sell,p.sell-(p.genka||0)]);
+  });
+  let ks=0;document.querySelectorAll(".koji-row").forEach(r=>{
+    const ins=r.querySelectorAll("input");
+    let l,qty,a;
+    if(ins.length>=3){l=ins[0].value;qty=parseFloat(ins[1].value)||1;a=parseFloat(ins[2].value)||0;}
+    else{l=ins[0]?ins[0].value:"工事費";qty=1;a=ins[1]?parseFloat(ins[1].value)||0:0;}
+    const total=qty*a;
+    if(total>0){d.push([l+(qty>1?" × "+qty+"式":""),"工事費","","",total,""]);ks+=total;}
+  });
+  const ps=products.reduce((s,p)=>s+p.sell,0),disc=parseFloat(v("discount"))||0,dn=v("disc-note");
+  const sub=ps+ks-disc,tax=Math.round(sub*.1),tot=sub+tax;
+  const gs=products.reduce((s,p)=>s+(p.genka||0),0),kg=Math.round(ks*(1-kojiPR/100)),tp=(ps-gs)+(ks-kg),pr=sub>0?(tp/sub*100):0;
+  d.push(["","","","","",""]);if(disc>0)d.push(["値引き"+(dn?"（"+dn+"）":""),"","","",0-disc,""]);
+  d.push(["小計（税抜）","","","",sub,""]);d.push(["消費税（10%）","","","",tax,""]);d.push(["お見積金額（税込）","","","",tot,""]);
+  d.push(["","","","","",""]);d.push(["── 社内管理（粗利情報）──","","","","",""]);
+  d.push(["粗利額","","","",tp,""]);d.push(["粗利率","","","",pr.toFixed(1)+"%",""]);
+  d.push(["","","","","",""]);d.push(["発行元",co+(ct?"　"+ct:""),"","","",""]);
+  const ws=XLSX.utils.aoa_to_sheet(d);ws["!cols"]=[{wch:34},{wch:12},{wch:12},{wch:8},{wch:16},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws,"見積書");XLSX.writeFile(wb,"見積書_"+cn+"_"+(iss||"nodate")+".xlsx");
+}
+
+function loadDemo(type){
+  const t=new Date(),iso=d=>d.toISOString().split("T")[0];
+  const ex=new Date(t);ex.setDate(ex.getDate()+30);const pad=n=>String(n).padStart(4,"0");
+  const DM={
+    kitchen:{name:"山田 花子 様",tel:"090-1234-5678",addr:"埼玉県さいたま市大宮区〇〇 1-2-3",loc:"キッチン",staff:"鈴木 一郎",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"LIXIL",cat:"キッチン",name:"リシェルSI I型 2100mm",code:"RS-I2100",price:980000,rate:0.70,sell:686000,cr:0.52,genka:509600}],koji:[["設置工事費",120000],["既設品撤去処分費",35000],["給排水工事費",45000],["諸経費",20000]],disc:0},
+    bathroom:{name:"佐藤 次郎 様",tel:"090-9876-5432",addr:"埼玉県川口市〇〇 4-5-6",loc:"浴室",staff:"田中 美咲",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"TOTO",cat:"浴室",name:"サザナ Sタイプ 1616",code:"SZ-1616S",price:520000,rate:0.72,sell:374400,cr:0.53,genka:275600}],koji:[["解体工事費",80000],["設置工事費",100000],["給排水工事費",30000],["諸経費",15000]],disc:10000},
+    toilet:{name:"高橋 三郎 様",tel:"080-1111-2222",addr:"埼玉県越谷市〇〇 2-3-1",loc:"トイレ（1F・2F）",staff:"山本 健司",company:"スマイルリフォーム株式会社",ctel:"048-000-0000",prods:[{maker:"TOTO",cat:"トイレ",name:"ネオレスト AH1",code:"CES9710",price:328000,rate:0.65,sell:213200,cr:0.53,genka:173840},{maker:"TOTO",cat:"トイレ",name:"GG2 ZJ2",code:"CES9898",price:198000,rate:0.65,sell:128700,cr:0.53,genka:104940}],koji:[["設置工事費（×2箇所）",60000],["既設品撤去処分費",20000],["諸経費",10000]],disc:5000},
+  };
+  const dm=DM[type];if(!dm)return;
+  const s=(id,val)=>{const e=el(id);if(e)e.value=val||"";};
+  s("c-name",dm.name);s("c-tel",dm.tel);s("c-addr",dm.addr);s("c-loc",dm.loc);s("c-wdate",iso(new Date(t.getTime()+14*86400000)));
+  s("e-no","EST-"+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate()));s("e-issue",iso(t));s("e-expire",iso(ex));
+  s("e-staff",dm.staff);s("e-company",dm.company);s("e-ctel",dm.ctel);
+  products=JSON.parse(JSON.stringify(dm.prods));renderProds();
+  const kl=el("koji-list");kl.innerHTML="";
+  dm.koji.forEach(([l,a])=>{const r=document.createElement("div");r.className="koji-row";r.innerHTML='<input type="text" value="'+l+'"><input type="number" value="'+a+'"><button class="del-btn" onclick="delKoji(this)">✕</button>';kl.appendChild(r);});
+  s("discount",dm.disc);s("disc-note","");updateBar();closeAll();goStep(1);alert("デモデータを読み込みました！\nSTEP1〜4の流れをお試しください 🏠");
+}
+
+function clearAll(){
+  if(!confirm("すべてのデータをクリアしますか？\nこの操作は取り消せません。"))return;
+  ["c-name","c-tel","c-addr","c-loc","e-staff","e-company","e-ctel","discount","disc-note"].forEach(id=>{const e=el(id);if(e)e.value="";});
+  products=[];renderProds();
+  const kl=el("koji-list");kl.innerHTML="";
+  [["設置工事費"],["既設品撤去処分費"],["諸経費"]].forEach(([l])=>{const r=document.createElement("div");r.className="koji-row";r.innerHTML='<input type="text" value="'+l+'"><input type="number" placeholder="金額"><button class="del-btn" onclick="delKoji(this)">✕</button>';kl.appendChild(r);});
+  updateBar(0);closeAll();goStep(1);
+}
+</script>
+</body>
+</html>
