@@ -193,6 +193,19 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
 .btype-badge.mansion{background:#EFF6FF;color:#1D4ED8;}
 .btype-note{font-size:11px;color:var(--text-hint);}
 
+/* オプション・手入力パネル */
+.opt-tab-row{display:flex;gap:6px;margin-bottom:12px;}
+.opt-tab{padding:6px 16px;border-radius:16px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--gray-border);color:var(--text-sub);background:none;font-family:"Noto Sans JP",sans-serif;transition:all .15s;}
+.opt-tab.active{background:var(--copper);color:#fff;border-color:var(--copper);}
+.opt-quick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px;}
+@media(max-width:600px){.opt-quick-grid{grid-template-columns:repeat(3,1fr);}}
+.opt-quick-btn{padding:9px 6px;border:1px solid var(--gray-border);border-radius:8px;background:var(--copper-pale);color:var(--copper);font-size:11px;font-weight:500;cursor:pointer;text-align:center;font-family:"Noto Sans JP",sans-serif;line-height:1.5;transition:all .15s;}
+.opt-quick-btn:hover{background:var(--copper);color:#fff;border-color:var(--copper);}
+.opt-quick-btn.customize{background:none;border-style:dashed;color:var(--text-hint);}
+.opt-manual-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;}
+@media(max-width:640px){.opt-manual-row{grid-template-columns:1fr 1fr;}}
+.opt-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:6px;background:#EFF6FF;color:#1D4ED8;margin-left:5px;vertical-align:middle;}
+
 /* 見積鏡ページ */
 .kagami-page{background:#fff;border:1px solid var(--gray-border);border-radius:var(--r-lg);margin-bottom:14px;overflow:hidden;font-family:"Noto Sans JP",sans-serif;}
 .kagami-inner{padding:32px 36px;}
@@ -334,6 +347,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
       <div class="cr-row"><span class="cr-maker">🟢 TOTO</span><input type="number" class="cr-input" id="cr-TOTO" step="0.01" min="0.1" max="0.9" value="0.53"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
       <div class="cr-row"><span class="cr-maker">🟠 タカラ</span><input type="number" class="cr-input" id="cr-タカラ" step="0.01" min="0.1" max="0.9" value="0.54"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
       <div class="cr-row"><span class="cr-maker">⚪ その他</span><input type="number" class="cr-input" id="cr-その他" step="0.01" min="0.1" max="0.9" value="0.60"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
+      <div class="cr-row"><span class="cr-maker">🟣 パナソニック</span><input type="number" class="cr-input" id="cr-パナソニック" step="0.01" min="0.1" max="0.9" value="0.55"><span style="font-size:11px;color:var(--text-hint)">掛率</span></div>
       <div class="cr-row" style="margin-top:6px;border-top:1px solid var(--gray-border);padding-top:9px;"><span class="cr-maker">🔨 工事粗利率</span><input type="number" class="cr-input" id="cr-koji" step="1" min="0" max="99" value="35"><span style="font-size:11px;color:var(--text-hint)">%</span></div>
       <button class="demo-btn" onclick="saveCostRates()" style="margin-top:10px;border-color:var(--copper);color:var(--copper);"><span class="demo-btn-icon">💾</span><div><div class="demo-btn-label">掛率設定を保存</div><div class="demo-btn-desc">ブラウザに記憶されます</div></div></button>
       <div class="set-sec" style="margin-top:20px;">工事費テンプレート設定</div>
@@ -348,6 +362,36 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
       <div class="set-sec" style="margin-top:20px;">データ管理</div>
       <button class="clr-btn" onclick="clearAll()">🗑 すべてのデータをクリア</button>
       <div class="clr-note">入力した内容・追加した商品がすべて消去されます<br>この操作は取り消せません</div>
+
+      <div class="set-sec" style="margin-top:24px;">📦 商品マスター管理</div>
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:12px;line-height:1.8;">自社の単価表をExcelで管理し、アプリに一括インポートできます。<br>①フォーマットをダウンロード → ②自社単価に書き換え → ③インポートの順で設定してください。</div>
+
+      <button class="demo-btn" onclick="downloadMasterFormat()" style="border-color:#1D6A3A;color:#1D6A3A;">
+        <span class="demo-btn-icon">📥</span>
+        <div>
+          <div class="demo-btn-label">標準マスターフォーマットをDL</div>
+          <div class="demo-btn-desc">現在の商品データをExcelで書き出します</div>
+        </div>
+      </button>
+
+      <div style="position:relative;margin-bottom:7px;">
+        <button class="demo-btn" onclick="el('master-import-file').click()" style="border-color:#1A4EA6;color:#1A4EA6;width:100%;">
+          <span class="demo-btn-icon">📤</span>
+          <div>
+            <div class="demo-btn-label">Excelから商品マスターをインポート</div>
+            <div class="demo-btn-desc">書き換えたフォーマットを読み込みます</div>
+          </div>
+        </button>
+        <input type="file" id="master-import-file" accept=".xlsx,.xls" style="display:none" onchange="importMasterExcel(this)">
+      </div>
+
+      <div style="background:var(--copper-pale);border:1px solid rgba(181,115,58,.2);border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:var(--text-sub);line-height:1.8;margin-bottom:4px;">
+        <div style="font-weight:700;color:var(--copper);margin-bottom:3px;">⚠️ インポート前の確認事項</div>
+        ・フォーマットの列順・シート名を変えないでください<br>
+        ・インポートすると現在の商品マスターが上書きされます<br>
+        ・建物タイプ欄は both / detached / mansion のいずれかで入力してください<br>
+        ・掛率は 0.1〜0.99 の小数で入力してください（例：70%→0.70）
+      </div>
     </div>
   </div>
 </div>
@@ -367,6 +411,57 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
       </div>
     </div>
     <div class="modal-body" id="hist-list"></div>
+  </div>
+</div>
+
+<!-- 商品編集モーダル -->
+<div class="modal-bg" id="prod-edit-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:480px;">
+    <div class="modal-hdr">
+      <div class="modal-ttl">✏️ 商品の単価・内容を修正</div>
+      <button class="modal-close" onclick="el('prod-edit-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:14px;line-height:1.7;">追加済みの商品の単価・掛率・数量などを変更できます。<br>A邸の見積を複製してB邸用に単価修正する際にご利用ください。</div>
+      <input type="hidden" id="pe-idx">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="form-group"><label>商品名・内容</label><input type="text" id="pe-name" placeholder="商品名"></div>
+        <div class="form-grid">
+          <div class="form-group"><label>販売単価（円）</label><input type="number" id="pe-sell" placeholder="販売単価" min="0"></div>
+          <div class="form-group"><label>仕入れ原価（円）</label><input type="number" id="pe-cost" placeholder="原価" min="0"></div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>数量</label><input type="number" id="pe-qty" placeholder="1" min="1" step="1" value="1"></div>
+          <div class="form-group"><label>値引き額（この商品のみ・円）</label><input type="number" id="pe-disc" placeholder="0" min="0" value="0"></div>
+        </div>
+        <div style="background:var(--gray-subtle);border-radius:var(--r-sm);padding:12px;font-size:12px;color:var(--text-sub);line-height:2.0;" id="pe-preview">
+          計算結果がここに表示されます
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:16px;">
+        <button class="btn btn-outline" onclick="el('prod-edit-modal').classList.remove('open')" style="flex:1;justify-content:center;">キャンセル</button>
+        <button class="btn btn-copper" onclick="saveProdEdit()" style="flex:2;justify-content:center;">✅ この内容で確定する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- オプション編集モーダル -->
+<div class="modal-bg" id="opt-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="max-width:520px;">
+    <div class="modal-hdr"><div class="modal-ttl">⭐ よく使うオプション カスタマイズ</div><button class="modal-close" onclick="el('opt-modal').classList.remove('open')">✕</button></div>
+    <div class="modal-body">
+      <div style="font-size:11px;color:var(--text-hint);margin-bottom:12px;line-height:1.7;">STEP2の「よく使うオプション」に表示される項目を管理できます。</div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:7px;padding:0 2px;">
+        <div style="font-size:10px;font-weight:700;color:var(--text-hint);">商品名</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-hint);">販売価格</div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-hint);">原価</div>
+        <div></div>
+      </div>
+      <div id="opt-edit-rows"></div>
+      <button class="btn btn-outline" onclick="addOptItem()" style="width:100%;justify-content:center;margin-top:6px;">＋ 項目を追加</button>
+      <button class="btn btn-copper" onclick="saveOptItems()" style="width:100%;justify-content:center;margin-top:8px;">💾 保存する</button>
+    </div>
   </div>
 </div>
 
@@ -443,7 +538,7 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
     <div class="panel-title">商品を追加</div>
     <div class="prod-sel">
       <div class="sel-row">
-        <div class="form-group"><label>メーカー</label><select id="s-maker" onchange="onMaker()"><option value="">選択</option><option>LIXIL</option><option>TOTO</option><option value="タカラ">タカラスタンダード</option><option value="その他">その他</option></select></div>
+        <div class="form-group"><label>メーカー</label><select id="s-maker" onchange="onMaker()"><option value="">選択</option><option>LIXIL</option><option>TOTO</option><option value="タカラ">タカラスタンダード</option><option value="パナソニック">パナソニック</option><option value="その他">その他</option></select></div>
         <div class="form-group"><label>カテゴリ</label><select id="s-cat" onchange="onCat()"><option value="">選択</option></select></div>
         <div class="form-group"><label>商品</label><select id="s-prod" onchange="onProd()"><option value="">選択</option></select></div>
         <div class="form-group"><label>定価（円）</label><input type="number" id="s-price" placeholder="0" oninput="calcPrev()"></div>
@@ -460,6 +555,29 @@ select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%
     </div>
     <table class="item-table"><thead><tr><th>メーカー</th><th>カテゴリ</th><th>商品名・品番</th><th class="pc">定価</th><th class="pc">掛率</th><th class="pc">数量</th><th class="pc">販売価格</th><th></th></tr></thead>
     <tbody id="prod-tb"><tr><td colspan="8"><div class="empty-st"><div style="font-size:28px;margin-bottom:6px;">📦</div><div>商品を追加してください</div></div></td></tr></tbody></table>
+
+    <div style="border-top:1px solid var(--gray-border);margin-top:14px;padding-top:16px;">
+      <div class="panel-title">オプション・小物・手入力追加</div>
+      <div class="opt-tab-row">
+        <button class="opt-tab active" id="opt-tab-quick" onclick="switchOptTab('quick')">⭐ よく使うオプション</button>
+        <button class="opt-tab" id="opt-tab-manual" onclick="switchOptTab('manual')">✏️ 自由入力</button>
+      </div>
+
+      <div id="opt-panel-quick">
+        <div style="font-size:11px;color:var(--text-hint);margin-bottom:8px;">タップで即追加。金額は一覧で変更できます。</div>
+        <div class="opt-quick-grid" id="opt-quick-grid"></div>
+      </div>
+
+      <div id="opt-panel-manual" style="display:none;">
+        <div class="opt-manual-row">
+          <div class="form-group"><label>商品名・内容</label><input type="text" id="opt-name" placeholder="例）タオルバー（ニッケル）"></div>
+          <div class="form-group"><label>販売価格（円）</label><input type="number" id="opt-sell" placeholder="8000" min="0"></div>
+          <div class="form-group"><label>仕入れ原価（円・任意）</label><input type="number" id="opt-cost" placeholder="省略可" min="0"></div>
+          <div class="form-group" style="align-items:flex-end;"><button class="btn btn-copper" onclick="addOption()">追加</button></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-hint);margin-top:6px;">原価を入れると粗利パネルに自動反映されます。省略した場合は販売価格と同額として計算されます。</div>
+      </div>
+    </div>
   </div>
   <div style="display:flex;justify-content:space-between;"><button class="btn btn-outline" onclick="goStep(1)">← 戻る</button><button class="btn btn-copper" onclick="goStep(3)">工事費へ進む →</button></div>
 </div>
@@ -644,8 +762,16 @@ const MASTER={
       {name:"ベーシアハーモL", code:"ZA10H",price:95000, type:"both"},
     ],
     洗面台:[
-      {name:"ルミシス 750mm",code:"LM-750",price:385000,type:"both"},
-      {name:"エスタ 750mm",  code:"ES-750",price:168000,type:"both"},
+      {name:"ルミシス 750mm",           code:"LM-750",   price:385000,type:"detached"},
+      {name:"ルミシス 900mm",           code:"LM-900",   price:428000,type:"detached"},
+      {name:"エスタ 600mm",             code:"ES-600",   price:138000,type:"both"},
+      {name:"エスタ 750mm",             code:"ES-750",   price:168000,type:"both"},
+      {name:"エスタ 900mm",             code:"ES-900",   price:195000,type:"both"},
+      {name:"ピアラ 750mm 1面鏡",       code:"AR75N",    price:178000,type:"both"},
+      {name:"ピアラ 750mm 3面鏡",       code:"AR75T",    price:218000,type:"both"},
+      {name:"ピアラ 900mm 3面鏡",       code:"AR90T",    price:248000,type:"both"},
+      {name:"オフト 600mm",             code:"OFT-600",  price:128000,type:"mansion"},
+      {name:"オフト 750mm",             code:"OFT-750",  price:148000,type:"mansion"},
     ],
   },
   TOTO:{
@@ -666,8 +792,15 @@ const MASTER={
       {name:"ピュアレストQR",code:"CS230B", price:85000, type:"both"},
     ],
     洗面台:[
-      {name:"オクターブ 750mm",code:"OK-750",price:248000,type:"both"},
-      {name:"Vシリーズ 600mm", code:"VS-600",price:128000,type:"both"},
+      {name:"オクターブ 600mm 1面鏡",   code:"OK-600-1", price:198000,type:"both"},
+      {name:"オクターブ 750mm 1面鏡",   code:"OK-750-1", price:228000,type:"both"},
+      {name:"オクターブ 750mm 3面鏡",   code:"OK-750-3", price:268000,type:"both"},
+      {name:"オクターブ 900mm 3面鏡",   code:"OK-900-3", price:298000,type:"detached"},
+      {name:"Vシリーズ 600mm",          code:"VS-600",   price:128000,type:"both"},
+      {name:"Vシリーズ 750mm",          code:"VS-750",   price:148000,type:"both"},
+      {name:"Vシリーズ 750mm 3面鏡",   code:"VS-750T",  price:178000,type:"both"},
+      {name:"サクア 750mm",             code:"SK-750",   price:238000,type:"both"},
+      {name:"サクア 900mm",             code:"SK-900",   price:278000,type:"detached"},
     ],
   },
   タカラ:{
@@ -681,13 +814,29 @@ const MASTER={
       {name:"ミーナ マンション用 1216",code:"MN-1216",price:360000,type:"mansion"},
     ],
     洗面台:[
-      {name:"エリーナ 750mm",code:"EL-750",price:195000,type:"both"},
+      {name:"エリーナ 600mm",           code:"EL-600",   price:168000,type:"both"},
+      {name:"エリーナ 750mm",           code:"EL-750",   price:195000,type:"both"},
+      {name:"エリーナ 900mm",           code:"EL-900",   price:228000,type:"detached"},
+      {name:"オフェリア 750mm 1面鏡",   code:"OF-750-1", price:215000,type:"both"},
+      {name:"オフェリア 750mm 3面鏡",   code:"OF-750-3", price:258000,type:"both"},
+      {name:"オフェリア 900mm 3面鏡",   code:"OF-900-3", price:295000,type:"detached"},
     ],
   },
   その他:{その他:[{name:"（手動入力）",code:"",price:0,type:"both"}]},
+  パナソニック:{
+    洗面台:[
+      {name:"シーライン 600mm 1面鏡",  code:"CL-600-1",price:168000,type:"both"},
+      {name:"シーライン 750mm 1面鏡",  code:"CL-750-1",price:198000,type:"both"},
+      {name:"シーライン 750mm 3面鏡",  code:"CL-750-3",price:238000,type:"both"},
+      {name:"シーライン 900mm 3面鏡",  code:"CL-900-3",price:278000,type:"detached"},
+      {name:"ウツクシーズ 600mm",       code:"UT-600",  price:148000,type:"both"},
+      {name:"ウツクシーズ 750mm",       code:"UT-750",  price:178000,type:"both"},
+      {name:"ウツクシーズ 750mm 3面鏡",code:"UT-750T", price:218000,type:"both"},
+    ],
+  },
 };
 
-let products=[],costRates={LIXIL:0.52,TOTO:0.53,タカラ:0.54,その他:0.60},kojiPR=35;
+let products=[],costRates={LIXIL:0.52,TOTO:0.53,タカラ:0.54,パナソニック:0.55,その他:0.60},kojiPR=35;
 
 // ベスト5 — 一戸建てセット / マンションセット
 const DB5_DETACHED=[
@@ -717,7 +866,7 @@ window.onload=()=>{
   el("e-no").value="EST-"+t.getFullYear()+pad(t.getMonth()+1)+pad(t.getDate());
   el("hdr-date").textContent=t.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric"});
   if(localStorage.getItem("darkMode")==="1"){document.body.classList.add("dark");el("dark-tgl").checked=true;}
-  loadCR();loadB5();applyProfile();loadKojiTpl();loadStamps();
+  loadCR();loadB5();applyProfile();loadKojiTpl();loadStamps();loadOptItems();loadCustomMaster();
 };
 
 function applyProfile(){
@@ -757,11 +906,11 @@ function goStep(n){
 function loadCR(){
   const s=localStorage.getItem("costRates");if(s){try{costRates=JSON.parse(s);}catch(e){}}
   const k=localStorage.getItem("kojiPR");if(k)kojiPR=parseFloat(k)||35;
-  ["LIXIL","TOTO","タカラ","その他"].forEach(m=>{const e=el("cr-"+m);if(e)e.value=costRates[m]||0.55;});
+  ["LIXIL","TOTO","タカラ","パナソニック","その他"].forEach(m=>{const e=el("cr-"+m);if(e)e.value=costRates[m]||0.55;});
   const ke=el("cr-koji");if(ke)ke.value=kojiPR;
 }
 function saveCostRates(){
-  ["LIXIL","TOTO","タカラ","その他"].forEach(m=>{const e=el("cr-"+m);if(e)costRates[m]=parseFloat(e.value)||0.55;});
+  ["LIXIL","TOTO","タカラ","パナソニック","その他"].forEach(m=>{const e=el("cr-"+m);if(e)costRates[m]=parseFloat(e.value)||0.55;});
   const ke=el("cr-koji");if(ke)kojiPR=parseFloat(ke.value)||35;
   localStorage.setItem("costRates",JSON.stringify(costRates));localStorage.setItem("kojiPR",kojiPR);
   alert("仕入れ掛率を保存しました ✅");closeAll();
@@ -894,22 +1043,29 @@ function renderProds(){
     const qty=p.qty||1;
     const profit=p.sell-(p.genka||0),pc=profit>=0?"#2E7D5E":"#c0392b";
     const bc=p.maker==="LIXIL"?"bl":p.maker==="TOTO"?"bt":p.maker==="タカラ"?"bk":"bo";
+    const optBadge=p.isOption?'<span class="opt-badge">オプション</span>':"";
+    const makerCell=p.isOption
+      ?'<td><span class="bdg" style="background:#EFF6FF;color:#1D4ED8;">小物</span></td>'
+      :'<td><span class="bdg '+bc+'">'+p.maker+'</span></td>';
     return '<tr>'
-      +'<td><span class="bdg '+bc+'">'+p.maker+'</span></td>'
+      +makerCell
       +'<td style="color:var(--text-sub)">'+p.cat+'</td>'
-      +'<td><div style="font-weight:500">'+p.name+'</div>'+(p.code?'<div style="font-size:11px;color:var(--text-hint)">'+p.code+'</div>':'')+'</td>'
+      +'<td><div style="font-weight:500">'+p.name+optBadge+'</div>'+(p.code?'<div style="font-size:11px;color:var(--text-hint)">'+p.code+'</div>':'')+'</td>'
       +'<td class="pc" style="color:var(--text-hint)">¥'+(p.unitSell||p.sell).toLocaleString()+'</td>'
-      +'<td class="pc" style="color:var(--text-sub)">'+(p.rate*100).toFixed(0)+'%</td>'
+      +'<td class="pc" style="color:var(--text-sub)">'+(p.isOption?"—":(p.rate*100).toFixed(0)+"%")+'</td>'
       +'<td class="pc"><div class="qty-cell" style="justify-content:flex-end;">'
         +'<button class="qty-btn" onclick="changeQty('+i+',-1)">−</button>'
         +'<span class="qty-num">'+qty+'</span>'
         +'<button class="qty-btn" onclick="changeQty('+i+',1)">＋</button>'
       +'</div></td>'
       +'<td class="pc"><div style="font-weight:500">¥'+p.sell.toLocaleString()+'</div>'
-        +(qty>1?'<div style="font-size:11px;color:var(--text-hint)">'+qty+'台×¥'+(p.unitSell||0).toLocaleString()+'</div>':'')
+        +(qty>1?'<div style="font-size:11px;color:var(--text-hint)">'+qty+'個×¥'+(p.unitSell||0).toLocaleString()+'</div>':'')
         +'<div style="font-size:11px;color:'+pc+';font-weight:500;margin-top:1px;">粗利 ¥'+profit.toLocaleString()+'</div>'
       +'</td>'
-      +'<td><button class="del-btn" onclick="delProd('+i+')">✕</button></td>'
+      +'<td style="display:flex;gap:4px;align-items:center;padding:10px 6px;">'
+      +'<button style="background:none;border:1px solid var(--gray-border);color:var(--text-sub);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;white-space:nowrap;" onclick="openProdEdit('+i+')">✏️ 編集</button>'
+      +'<button class="del-btn" onclick="delProd('+i+')">✕</button>'
+      +'</td>'
       +'</tr>';
   }).join("");
 }
@@ -922,6 +1078,56 @@ function changeQty(i,delta){
   renderProds();updateBar();
 }
 function delProd(i){products.splice(i,1);renderProds();updateBar();}
+
+// ── 商品インライン編集 ──
+function openProdEdit(i){
+  const p=products[i];if(!p)return;
+  el("pe-idx").value=i;
+  el("pe-name").value=p.name||"";
+  el("pe-sell").value=p.unitSell||Math.round(p.price*p.rate)||p.sell||0;
+  el("pe-cost").value=p.unitGenka||p.genka||0;
+  el("pe-qty").value=p.qty||1;
+  el("pe-disc").value=p._disc||0;
+  updatePePreview();
+  ["pe-sell","pe-cost","pe-qty","pe-disc"].forEach(id=>el(id).addEventListener("input",updatePePreview));
+  el("prod-edit-modal").classList.add("open");
+}
+function updatePePreview(){
+  const sell=parseFloat(el("pe-sell").value)||0;
+  const cost=parseFloat(el("pe-cost").value)||0;
+  const qty=Math.max(1,parseInt(el("pe-qty").value)||1);
+  const disc=parseFloat(el("pe-disc").value)||0;
+  const totalSell=sell*qty-disc;
+  const totalCost=cost*qty;
+  const profit=totalSell-totalCost;
+  const profitColor=profit>=0?"#2E7D5E":"#c0392b";
+  el("pe-preview").innerHTML=
+    "販売単価：¥"+sell.toLocaleString()+" × "+qty+"点"+(disc>0?" − 値引 ¥"+disc.toLocaleString():"")
+    +"<br>販売合計：<strong>¥"+totalSell.toLocaleString()+"</strong>"
+    +"<br>粗利：<span style='color:"+profitColor+";font-weight:700;'>¥"+profit.toLocaleString()+"</span>"
+    +(totalSell>0?" （"+Math.round(profit/totalSell*100)+"%）":"");
+}
+function saveProdEdit(){
+  const i=parseInt(el("pe-idx").value);
+  const p=products[i];if(!p)return;
+  const sell=parseFloat(el("pe-sell").value)||0;
+  const cost=parseFloat(el("pe-cost").value)||0;
+  const qty=Math.max(1,parseInt(el("pe-qty").value)||1);
+  const disc=parseFloat(el("pe-disc").value)||0;
+  p.name=el("pe-name").value||p.name;
+  p.unitSell=sell;
+  p.unitGenka=cost;
+  p.qty=qty;
+  p._disc=disc;
+  p.sell=sell*qty-disc;
+  p.genka=cost*qty;
+  ["pe-sell","pe-cost","pe-qty","pe-disc"].forEach(id=>{
+    const e=el(id);if(e)e.removeEventListener("input",updatePePreview);
+  });
+  el("prod-edit-modal").classList.remove("open");
+  renderProds();updateBar();
+  if(document.getElementById("step3").classList.contains("active"))calcTotals();
+}
 function addKoji(){
   const r=document.createElement("div");r.className="koji-row";
   r.innerHTML='<input type="text" placeholder="工事項目"><input type="number" value="1" min="1" step="1" style="width:100%;"><input type="number" placeholder="金額"><button class="del-btn" onclick="delKoji(this)">✕</button>';
@@ -980,13 +1186,111 @@ function toWareki(iso){
   return era+(ey===1?"元":ey)+"年"+m+"月"+dd+"日";
 }
 
+// ── オプション・小物 ──
+const DEFAULT_OPTIONS=[
+  {name:"タオルバー",     price:8500,  cost:4000},
+  {name:"シャワーホース", price:5500,  cost:2500},
+  {name:"鏡（ミラー）",  price:18000, cost:8000},
+  {name:"収納棚",         price:14000, cost:6000},
+  {name:"水栓金具",       price:22000, cost:10000},
+  {name:"手すり",         price:25000, cost:12000},
+  {name:"換気扇",         price:28000, cost:13000},
+  {name:"浴室乾燥機",     price:55000, cost:28000},
+  {name:"食洗機",         price:85000, cost:42000},
+  {name:"レンジフード",   price:48000, cost:22000},
+  {name:"トイレットペーパーホルダー",price:4500,cost:2000},
+  {name:"タオルリング",   price:3500,  cost:1500},
+];
+let optItems=[...DEFAULT_OPTIONS];
+
+function loadOptItems(){
+  const s=localStorage.getItem("optItems");
+  if(s)try{optItems=JSON.parse(s);}catch(e){}
+  renderOptQuickGrid();
+}
+function renderOptQuickGrid(){
+  const g=el("opt-quick-grid");if(!g)return;
+  g.innerHTML=optItems.map((o,i)=>
+    '<button class="opt-quick-btn" onclick="addFromOpt('+i+')">'
+    +o.name+'<br><span style="color:rgba(181,115,58,.7);font-size:10px;">¥'+o.price.toLocaleString()+'</span></button>'
+  ).join("")
+  +'<button class="opt-quick-btn customize" onclick="openOptEdit()">＋<br><span style="font-size:10px;">カスタマイズ</span></button>';
+}
+function switchOptTab(t){
+  ["quick","manual"].forEach(k=>{
+    el("opt-tab-"+k).classList.toggle("active",k===t);
+    el("opt-panel-"+k).style.display=k===t?"":"none";
+  });
+}
+function addFromOpt(i){
+  const o=optItems[i];if(!o)return;
+  products.push({
+    maker:"オプション",cat:"オプション",name:o.name,code:"",
+    price:o.price,rate:1,sell:o.price,unitSell:o.price,
+    cr:0,genka:o.cost||0,unitGenka:o.cost||0,
+    qty:1,btype,isOption:true
+  });
+  renderProds();updateBar();
+  const btn=el("opt-quick-grid").querySelectorAll(".opt-quick-btn")[i];
+  if(btn){btn.style.background="#D1FAE5";btn.style.borderColor="#2E7D5E";setTimeout(()=>{btn.style.background="";btn.style.borderColor="";},500);}
+}
+function addOption(){
+  const name=el("opt-name").value.trim();
+  const sell=parseFloat(el("opt-sell").value)||0;
+  const cost=parseFloat(el("opt-cost").value)||sell;
+  if(!name){alert("商品名・内容を入力してください");return;}
+  if(!sell){alert("販売価格を入力してください");return;}
+  products.push({
+    maker:"オプション",cat:"オプション",name,code:"",
+    price:sell,rate:1,sell,unitSell:sell,
+    cr:0,genka:cost,unitGenka:cost,
+    qty:1,btype,isOption:true
+  });
+  el("opt-name").value="";el("opt-sell").value="";el("opt-cost").value="";
+  renderProds();updateBar();
+}
+
+// オプションカスタマイズモーダル
+function openOptEdit(){
+  const rows=el("opt-edit-rows");if(!rows)return;
+  rows.innerHTML=optItems.map((o,i)=>
+    '<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;margin-bottom:7px;">'
+    +'<input type="text" id="otn'+i+'" value="'+o.name+'" style="font-size:12px;height:32px;">'
+    +'<input type="number" id="otp'+i+'" value="'+o.price+'" style="font-size:12px;height:32px;" placeholder="販売価格">'
+    +'<input type="number" id="otc'+i+'" value="'+o.cost+'" style="font-size:12px;height:32px;" placeholder="原価">'
+    +'<button style="height:32px;padding:0 8px;background:none;border:1px solid #FECACA;color:#B91C1C;border-radius:4px;cursor:pointer;font-size:12px;" onclick="delOptItem('+i+')">✕</button>'
+    +'</div>'
+  ).join("");
+  el("opt-modal").classList.add("open");
+}
+function delOptItem(i){
+  optItems.splice(i,1);openOptEdit();
+}
+function addOptItem(){
+  optItems.push({name:"新しい項目",price:10000,cost:5000});openOptEdit();
+}
+function saveOptItems(){
+  const saved=[];
+  optItems.forEach((_,i)=>{
+    const n=el("otn"+i),p=el("otp"+i),c=el("otc"+i);
+    if(n&&n.value)saved.push({name:n.value,price:parseFloat(p.value)||0,cost:parseFloat(c.value)||0});
+  });
+  optItems=saved;
+  localStorage.setItem("optItems",JSON.stringify(optItems));
+  renderOptQuickGrid();
+  el("opt-modal").classList.remove("open");
+  alert("オプション一覧を保存しました ✅");
+}
+
 const DEFAULT_KOJI_TPL=[
   {name:"キッチン 一戸建て",items:[["設置工事費",1,120000],["既設品撤去処分費",1,35000],["給排水工事費",1,45000],["諸経費",1,20000]]},
   {name:"キッチン マンション",items:[["設置工事費",1,100000],["既設品撤去処分費",1,30000],["給排水工事費",1,40000],["搬入養生費",1,15000],["諸経費",1,15000]]},
   {name:"浴室 一戸建て",  items:[["解体工事費",1,80000],["設置工事費",1,100000],["給排水工事費",1,30000],["諸経費",1,15000]]},
   {name:"浴室 マンション",items:[["解体工事費",1,70000],["設置工事費",1,90000],["給排水工事費",1,30000],["搬入養生費",1,15000],["諸経費",1,15000]]},
   {name:"トイレ 標準",    items:[["設置工事費",1,45000],["既設品撤去処分費",1,15000],["諸経費",1,8000]]},
-  {name:"洗面台 標準",    items:[["設置工事費",1,35000],["既設品撤去処分費",1,12000],["諸経費",1,8000]]},
+  {name:"洗面台 一戸建て",items:[["設置工事費",1,40000],["既設品撤去処分費",1,15000],["給排水工事費",1,12000],["諸経費",1,8000]]},
+  {name:"洗面台 マンション",items:[["設置工事費",1,38000],["既設品撤去処分費",1,12000],["給排水工事費",1,12000],["搬入養生費",1,8000],["諸経費",1,8000]]},
+  {name:"洗面台 + トイレ",items:[["洗面台設置工事費",1,40000],["トイレ設置工事費",1,45000],["既設品撤去処分費",2,15000],["給排水工事費",1,15000],["諸経費",1,10000]]},
 ];
 let kojiTpls=[];
 
@@ -1143,7 +1447,6 @@ function buildPrev(){
   el("ep-client").innerHTML="<strong>"+(v("c-name")||"—")+"</strong><br>"+(v("c-addr")||"—")+"<br>"+v("c-tel")+"<br><br>工事予定日："+(v("c-wdate")||"—");
   const co=v("e-company"),ct=v("e-ctel"),st=v("e-staff");
   el("ep-co").innerHTML=co+(ct?"　"+ct:"")+(st?"　担当："+st:"");
-  const bikoRaw=el("備考").value||"";
   el("ep-note").innerHTML="【備考】<br>"+bikoRaw.replace(/\n/g,"<br>");
   let rows="";
   products.forEach(p=>{
@@ -1162,8 +1465,7 @@ function buildPrev(){
     }
   });
   el("ep-tb").innerHTML=rows;
-  const ps=products.reduce((s,p)=>s+p.sell,0),ks=getKojiSum(),disc=parseFloat(el("discount").value)||0,dn=v("disc-note");
-  const sub=ps+ks-disc,tax=Math.round(sub*.1),tot=sub+tax;
+  const dn=v("disc-note");
   let th="<div class='epr'><span>商品合計</span><span>¥"+ps.toLocaleString()+"</span></div><div class='epr'><span>工事費合計</span><span>¥"+ks.toLocaleString()+"</span></div>";
   if(disc>0)th+="<div class='epr'><span>値引き"+(dn?"（"+dn+"）":"")+"</span><span>−¥"+disc.toLocaleString()+"</span></div>";
   th+="<div class='epr'><span>小計（税抜）</span><span>¥"+sub.toLocaleString()+"</span></div><div class='epr'><span>消費税（10%）</span><span>¥"+tax.toLocaleString()+"</span></div><div class='epr grand'><span>お見積金額（税込）</span><span>¥"+tot.toLocaleString()+"</span></div>";
@@ -1322,6 +1624,161 @@ function loadDemo(type){
   const kl=el("koji-list");kl.innerHTML="";
   dm.koji.forEach(([l,a])=>{const r=document.createElement("div");r.className="koji-row";r.innerHTML='<input type="text" value="'+l+'"><input type="number" value="'+a+'"><button class="del-btn" onclick="delKoji(this)">✕</button>';kl.appendChild(r);});
   s("discount",dm.disc);s("disc-note","");updateBar();closeAll();goStep(1);alert("デモデータを読み込みました！\nSTEP1〜4の流れをお試しください 🏠");
+}
+
+// ════════════════════════════════
+// 商品マスター Excel入出力
+// ════════════════════════════════
+function downloadMasterFormat(){
+  if(typeof XLSX==="undefined"){alert("ライブラリ読み込み中です。少し待ってからお試しください。");return;}
+  const wb=XLSX.utils.book_new();
+
+  // シート1: 商品マスター
+  const masterRows=[
+    ["メーカー","カテゴリ","商品名","品番","定価","販売掛率","仕入れ掛率","建物タイプ"],
+    ["","","","","","","","※ both=共通 / detached=一戸建て / mansion=マンション"],
+  ];
+  Object.keys(MASTER).forEach(maker=>{
+    Object.keys(MASTER[maker]).forEach(cat=>{
+      MASTER[maker][cat].forEach(p=>{
+        masterRows.push([
+          maker,cat,p.name,p.code||"",p.price,
+          costRates[maker]||0.55,
+          costRates[maker]||0.55,
+          p.type||"both"
+        ]);
+      });
+    });
+  });
+  const ws1=XLSX.utils.aoa_to_sheet(masterRows);
+  ws1["!cols"]=[{wch:14},{wch:10},{wch:30},{wch:14},{wch:10},{wch:10},{wch:10},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,ws1,"商品マスター");
+
+  // シート2: 掛率設定
+  const rateRows=[
+    ["メーカー","販売掛率（デフォルト）","仕入れ掛率","備考"],
+    ["LIXIL",       0.70,costRates["LIXIL"]       ||0.52,""],
+    ["TOTO",        0.72,costRates["TOTO"]         ||0.53,""],
+    ["タカラ",      0.70,costRates["タカラ"]       ||0.54,""],
+    ["パナソニック",0.70,costRates["パナソニック"] ||0.55,""],
+    ["その他",      0.70,costRates["その他"]        ||0.60,""],
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(rateRows);
+  ws2["!cols"]=[{wch:14},{wch:18},{wch:12},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,ws2,"掛率設定");
+
+  // シート3: 記入説明
+  const helpRows=[
+    ["リフォーム見積くん 商品マスターフォーマット 記入説明"],
+    [""],
+    ["【商品マスターシートの記入方法】"],
+    ["列名","説明","入力例"],
+    ["メーカー","メーカー名","LIXIL"],
+    ["カテゴリ","商品カテゴリ","洗面台"],
+    ["商品名","アプリに表示される商品名","ピアラ 750mm 3面鏡"],
+    ["品番","型番・品番","AR75T"],
+    ["定価","メーカー定価（税抜・円）","178000"],
+    ["販売掛率","お客様への販売価格の掛率","0.70"],
+    ["仕入れ掛率","自社の仕入れ原価の掛率","0.52"],
+    ["建物タイプ","both=共通 / detached=一戸建て / mansion=マンション","both"],
+    [""],
+    ["【注意事項】"],
+    ["・1行目（ヘッダー行）は変更しないでください"],
+    ["・定価は税抜き金額で入力してください"],
+    ["・掛率は小数で入力してください（例：70%→0.70）"],
+    ["・インポートするとアプリの商品マスターが上書きされます"],
+  ];
+  const ws3=XLSX.utils.aoa_to_sheet(helpRows);
+  ws3["!cols"]=[{wch:16},{wch:40},{wch:20}];
+  XLSX.utils.book_append_sheet(wb,ws3,"記入説明");
+
+  XLSX.writeFile(wb,"リフォーム見積くん_商品マスターフォーマット.xlsx");
+}
+
+function importMasterExcel(input){
+  const file=input.files[0];if(!file)return;
+  if(typeof XLSX==="undefined"){alert("ライブラリ読み込み中です。少し待ってからお試しください。");return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:"binary"});
+
+      // 掛率シートを先に読む
+      const rateSheet=wb.Sheets["掛率設定"];
+      if(rateSheet){
+        const rateData=XLSX.utils.sheet_to_json(rateSheet,{header:1,defval:""});
+        rateData.slice(1).forEach(row=>{
+          const maker=String(row[0]||"").trim();
+          const cr=parseFloat(row[2]);
+          if(maker&&!isNaN(cr))costRates[maker]=cr;
+        });
+        localStorage.setItem("costRates",JSON.stringify(costRates));
+        loadCR();
+      }
+
+      // 商品マスターシートを読む
+      const masterSheet=wb.Sheets["商品マスター"];
+      if(!masterSheet){alert("「商品マスター」シートが見つかりませんでした。フォーマットを確認してください。");return;}
+      const rows=XLSX.utils.sheet_to_json(masterSheet,{header:1,defval:""});
+      const newMaster={};
+      let ok=0,skip=0;
+
+      rows.slice(2).forEach(row=>{
+        const maker=String(row[0]||"").trim();
+        const cat  =String(row[1]||"").trim();
+        const name =String(row[2]||"").trim();
+        const code =String(row[3]||"").trim();
+        const price=parseFloat(row[4])||0;
+        const typeVal=String(row[7]||"both").trim();
+        const type=["both","detached","mansion"].includes(typeVal)?typeVal:"both";
+        if(!maker||!cat||!name||price<=0){skip++;return;}
+        if(!newMaster[maker])newMaster[maker]={};
+        if(!newMaster[maker][cat])newMaster[maker][cat]=[];
+        newMaster[maker][cat].push({name,code,price,type});
+        ok++;
+      });
+
+      if(ok===0){alert("インポートできる商品データが見つかりませんでした。フォーマットを確認してください。");input.value="";return;}
+
+      // その他は必ず保持
+      if(!newMaster["その他"])newMaster["その他"]={その他:[{name:"（手動入力）",code:"",price:0,type:"both"}]};
+
+      // MASTER更新
+      localStorage.setItem("customMaster",JSON.stringify(newMaster));
+      Object.keys(MASTER).forEach(k=>delete MASTER[k]);
+      Object.assign(MASTER,newMaster);
+      rebuildMakerSelect();
+      closeAll();
+      alert("✅ インポート完了！\n\n商品数："+ok+"件\nメーカー数："+Object.keys(newMaster).length+"社"+(skip>0?"\nスキップ："+skip+"件（空欄・不備）":"")+"\n\nSTEP2の商品選択に反映されました。");
+    }catch(err){
+      alert("読み込みエラーが発生しました。\nフォーマットを確認してください。\n\n"+err.message);
+    }
+    input.value="";
+  };
+  reader.readAsBinaryString(file);
+}
+
+function rebuildMakerSelect(){
+  const sel=el("s-maker");if(!sel)return;
+  sel.innerHTML='<option value="">選択</option>';
+  Object.keys(MASTER).forEach(m=>{
+    const o=document.createElement("option");
+    o.value=m;
+    o.textContent=m==="タカラ"?"タカラスタンダード":m;
+    sel.appendChild(o);
+  });
+}
+
+function loadCustomMaster(){
+  const saved=localStorage.getItem("customMaster");
+  if(saved){
+    try{
+      const custom=JSON.parse(saved);
+      Object.keys(MASTER).forEach(k=>delete MASTER[k]);
+      Object.assign(MASTER,custom);
+      rebuildMakerSelect();
+    }catch(e){}
+  }
 }
 
 function clearAll(){
